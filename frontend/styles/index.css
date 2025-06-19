@@ -1,0 +1,80 @@
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-gradient-back {
+  display: flex;
+  justify-content: center;
+}
+
+.main-wrapper {
+  width: 50%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: "Space Mono", monospace;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+
+.after-title {
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-family: "Poppins", sans-serif;
+  line-height: 1.25;
+  color: var(--paragraph);
+  margin-bottom: 20px;
+}
+
+.main-container .btn-container {
+  width: fit-content;
+  margin: 30px;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Media Queries */
+
+@media only screen and (max-width: 1080px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .main-wrapper {
+    width: calc(100% - 80px);
+  }
+}
+
+@media only screen and (max-width: 580px) {
+  .title,
+  .after-title {
+    text-align: left;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .after-title {
+    font-size: 1.125rem;
+  }
+
+  .main-gradient-back .btn-container {
+    margin: 20px 0 0 0;
+    justify-content: flex-start;
+    align-self: flex-start;
+  }
+}

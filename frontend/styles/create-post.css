@@ -1,0 +1,140 @@
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--black);
+  margin-bottom: 40px;
+}
+
+.bottom-text {
+  text-align: center;
+  color: var(--black);
+  margin: 20px 0 10px 0;
+  font-family: "Poppins", sans-serif;
+}
+
+.after-bottom-text {
+  font-weight: 700;
+  text-align: center;
+  color: var(--secondary);
+  font-family: "Poppins", sans-serif;
+}
+
+.main-wrapper .btn-container {
+  width: 75%;
+  max-width: 520px;
+  min-width: 160px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Forms and Inputs */
+
+.control-label {
+  cursor: pointer;
+}
+
+.form-vertical {
+  width: 75%;
+  max-width: 520px;
+  min-width: 160px;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+.form-control {
+  width: 100%;
+  display: flex;
+  flex-flow: column-reverse;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-wrapper {
+  width: 100%;
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin-bottom: 20px;
+  background-color: var(--semi-black);
+}
+
+.control-label {
+  width: 100%;
+  text-align: left;
+  color: var(--black);
+  margin-bottom: 6px;
+  font-weight: 700;
+  font-family: "Space Grotesk", monospace;
+}
+
+.input-field {
+  font-weight: 700;
+  color: var(--white);
+  width: 100%;
+  padding: 4px 0;
+  font-family: "Poppins", sans-serif;
+  border: 0;
+  background-color: transparent;
+}
+
+textarea.input-field {
+  font-size: 0.75rem;
+}
+
+textarea.input-field {
+  resize: vertical;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset;
+}
+
+.main-back .horizontal-rule {
+  max-width: 520px;
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  height: 2px;
+  background-color: var(--primary);
+  border-radius: 2px;
+  transition: all 0.4s;
+}
+
+.horizontal-shadow {
+  position: absolute;
+  top: 0;
+  left: 35%;
+  width: 30%;
+  height: 2px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0);
+  transition: all 0.4s;
+}
+
+/* Media Queries */
+
+@media only screen and (max-width: 1080px) {
+  .main-back {
+    padding: 40px 20px;
+  }
+
+  .main-wrapper {
+    width: calc(100% - 10px);
+  }
+}
+
+@media only screen and (max-width: 580px) {
+  .main-back {
+    padding: 40px 5px;
+  }
+
+  .main-wrapper .btn-container {
+    flex-flow: column nowrap;
+  }
+}

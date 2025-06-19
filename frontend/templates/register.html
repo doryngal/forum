@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- FAVICON -->
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="../assets/favicon/apple-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="../assets/favicon/apple-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="../assets/favicon/apple-icon-72x72.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="../assets/favicon/apple-icon-76x76.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      href="../assets/favicon/apple-icon-114x114.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="../assets/favicon/apple-icon-120x120.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="../assets/favicon/apple-icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="../assets/favicon/apple-icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="../assets/favicon/apple-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="../assets/favicon/android-icon-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../assets/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="../assets/favicon/favicon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../assets/favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="../assets/favicon/manifest.json" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta
+      name="msapplication-TileImage"
+      content="../assets/favicon/ms-icon-144x144.png"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <!-- RESET CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
+      integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- REMIX ICONS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;700;900&family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@1,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- STYLE CSS -->
+    <link rel="stylesheet" href="../styles/style.css" />
+    <!-- LOGIN/REGISTER CSS -->
+    <link rel="stylesheet" href="../styles/login-register.css" />
+    <title>Okumi - Register</title>
+  </head>
+  <body>
+    <main class="main" id="main">
+      <!-- NAVBAR -->
+      <header class="header">
+        <nav class="navbar" id="navbar">
+          <div class="logo-container">
+            <h1 class="nav-logo">
+              <a href="index.html" accesskey="q">Okumi</a>
+            </h1>
+          </div>
+          <div class="anchors-container">
+            <a href="https://01.alem.school/" class="nav-link">Alem School</a
+            ><a
+              href="https://github.com/01-edu/public/tree/master/subjects/forum"
+              class="nav-link"
+              >Requirements</a
+            ><a href="https://github.com/SE-Designs/forum-v2" class="nav-link"
+              >Source Code</a
+            >
+          </div>
+          <div class="btn-container">
+            <a href="login.html"
+              ><button class="btn btn-primary" id="btn-login">Login</button></a
+            ><a href="../templates/register.html"
+              ><button class="btn btn-secondary" id="btn-register">
+                Register
+              </button></a
+            >
+          </div>
+        </nav>
+      </header>
+      <!-- MAIN CONTENT -->
+      <div class="main-gradient-back" id="main-gradient-back">
+        <div class="main-wrapper">
+          <h2 class="title bw-100">Register Now</h2>
+          <form action="#" class="form-vertical" method="POST">
+            <div class="profile-picture-container">
+              <h5>Your avatar will be displayed here</h5>
+            </div>
+            <div class="form-control">
+              <div class="form-wrapper">
+                <input
+                  class="input-field"
+                  type="text"
+                  name="username"
+                  id="username"
+                  required
+                  maxlength="24"
+                  autocomplete="username"
+                  accesskey="1"
+                  autofocus
+                />
+                <div class="horizontal-rule">
+                  <div class="horizontal-shadow"></div>
+                </div>
+              </div>
+              <label class="control-label" for="username">Username:</label>
+            </div>
+            <div class="form-control">
+              <div class="form-wrapper">
+                <input
+                  class="input-field"
+                  type="email"
+                  name="email"
+                  id="email"
+                  required
+                  maxlength="48"
+                  autocomplete="email"
+                  accesskey="2"
+                />
+                <div class="horizontal-rule">
+                  <div class="horizontal-shadow"></div>
+                </div>
+              </div>
+              <label class="control-label" for="email">Email:</label>
+            </div>
+            <div class="form-control">
+              <div class="form-wrapper">
+                <input
+                  class="input-field"
+                  type="password"
+                  name="password"
+                  id="password"
+                  required
+                  maxlength="48"
+                  autocomplete="current-password"
+                  accesskey="3"
+                />
+                <div class="horizontal-rule">
+                  <div class="horizontal-shadow"></div>
+                </div>
+              </div>
+              <label class="control-label" for="password">Password:</label>
+            </div>
+            <div class="form-control">
+              <div class="form-wrapper">
+                <input
+                  class="input-field"
+                  type="password"
+                  name="repeat-password"
+                  id="repeat-password"
+                  required
+                  maxlength="48"
+                  autocomplete="current-password"
+                  accesskey="4"
+                />
+                <div class="horizontal-rule">
+                  <div class="horizontal-shadow"></div>
+                </div>
+              </div>
+              <label class="control-label" for="repeat-password"
+                >Repeat Password:</label
+              >
+            </div>
+            <button class="btn bw-100 btn-white">Register</button>
+            <span class="bottom-text">Already have an account?</span>
+            <a
+              href="login.html"
+              class="after-bottom-text"
+              id="login-btn"
+              >Login</a
+            >
+          </form>
+          <span class="bottom-text">or login with:</span>
+          <div class="btn-container">
+            <button class="btn btn-black" title="Login with Google">
+              <i class="ri-google-line"></i>
+            </button>
+            <button class="btn btn-black" title="Login with Facebook">
+              <i class="ri-facebook-circle-line"></i>
+            </button>
+            <button class="btn btn-black" title="Login with Github">
+              <i class="ri-github-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/register.js"></script>
+  </body>
+</html>

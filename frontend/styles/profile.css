@@ -1,0 +1,141 @@
+.main-wrapper .btn-container {
+  width: 100%;
+  max-width: 1200px;
+  min-width: 160px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  color: var(--black);
+  border: 2px solid var(--black);
+  margin-bottom: 40px;
+}
+
+.profile-container .horizontal-rule {
+  margin: 10px 0 20px;
+  height: 2px;
+  background-color: var(--black);
+}
+
+strong {
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+strong::before {
+  content: "@";
+}
+
+.img-profile {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.img-profile:hover {
+  color: var(--primary);
+}
+
+.img-profile > img {
+  border-radius: 50%;
+  border: 2px solid var(--black);
+}
+
+.info-profile {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.info-profile a {
+  text-align: center;
+}
+
+.info-profile-box {
+  display: block;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--semi-black);
+}
+
+.info-profile-box:hover {
+  border-bottom: 2px solid var(--primary);
+}
+
+.info-profile-box.active {
+  border-bottom: 2px solid var(--secondary);
+}
+
+.info-profile-box h6 {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.info-profile-box span {
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.posts {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-card {
+  display: flex;
+  flex-flow: row;
+  border: 2px solid var(--black);
+  padding: 12px;
+  gap: 12px;
+  border-radius: 4px;
+}
+
+.post-card > img {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--semi-white);
+  border-radius: 4px;
+}
+
+.post-card-info {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.post-card-info h4 {
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-family: "Poppins", sans-serif;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.post-card-info p {
+  color: var(--semi-black);
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.post-card-info .btn {
+  /* padding: 0; */
+}

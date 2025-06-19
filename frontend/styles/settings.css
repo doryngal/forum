@@ -1,0 +1,119 @@
+.title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-family: "Poppins", sans-serif;
+  color: var(--black);
+  text-align: center;
+}
+
+.themes {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.theme {
+  width: 120px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--black);
+  border: 2px solid var(--semi-white);
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.theme:hover {
+  border: 2px solid var(--primary);
+}
+
+.theme.active {
+  border: 2px solid var(--secondary);
+}
+
+.color-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  border-radius: 4px;
+  color: var(--white);
+  font-weight: 900;
+}
+
+.Default {
+  background: linear-gradient(
+    to right,
+    var(--black),
+    var(--black) 50%,
+    var(--semi-black) 50%,
+    var(--semi-black) 100%
+  );
+}
+
+.Primary {
+  background: linear-gradient(
+    to right,
+    var(--primary),
+    var(--primary) 50%,
+    #3c6408 50%,
+    #3c6408 100%
+  );
+}
+
+.Secondary {
+  background: linear-gradient(
+    to right,
+    var(--secondary),
+    var(--secondary) 50%,
+    var(--paragraph) 50%,
+    var(--paragraph) 100%
+  );
+}
+
+.Purple {
+  background: linear-gradient(
+    to right,
+    #ae2fc5,
+    #ae2fc5 50%,
+    #821697 50%,
+    #821697 100%
+  );
+}
+
+.Orange {
+  background: linear-gradient(
+    to right,
+    #e58816,
+    #e58816 50%,
+    #a26417 50%,
+    #a26417 100%
+  );
+}
+
+.WhiteSky {
+  background: linear-gradient(
+    to right,
+    #213bca,
+    #213bca 50%,
+    var(--secondary) 50%,
+    var(--secondary) 100%
+  );
+}
+
+.main-wrapper .horizontal-rule {
+  width: 100%;
+  max-width: calc(100% - 120px);
+  margin-bottom: 20px;
+}
+
+.delete-account {
+  margin: 20px 0;
+}

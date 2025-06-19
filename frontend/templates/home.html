@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- FAVICON -->
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="../assets/favicon/apple-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="../assets/favicon/apple-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="../assets/favicon/apple-icon-72x72.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="../assets/favicon/apple-icon-76x76.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      href="../assets/favicon/apple-icon-114x114.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="../assets/favicon/apple-icon-120x120.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="../assets/favicon/apple-icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="../assets/favicon/apple-icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="../assets/favicon/apple-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="../assets/favicon/android-icon-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../assets/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="../assets/favicon/favicon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../assets/favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="../assets/favicon/manifest.json" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta
+      name="msapplication-TileImage"
+      content="../assets/favicon/ms-icon-144x144.png"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <!-- RESET CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
+      integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- REMIX ICONS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;700;900&family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@1,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- STYLE CSS -->
+    <link rel="stylesheet" href="../styles/style.css" />
+    <!-- APP CSS -->
+    <link rel="stylesheet" href="../styles/app.css" />
+    <!-- HOME CSS -->
+    <link rel="stylesheet" href="../styles/home.css" />
+    <title>Okumi - Home</title>
+  </head>
+  <body>
+    <main class="main" id="main">
+      <!-- LOADER -->
+      <div class="full-loader" id="full-loader">
+        <img id="loader-img" src="../assets/images/preloder.gif" alt="" />
+      </div>
+      <!-- NAVBAR -->
+      <header class="header-with-side" id="header">
+        <nav class="navbar" id="navbar">
+          <div class="left-wrapper">
+            <div class="sidebar-container">
+              <div class="navbar-icon" tabindex="2" id="toggleside">
+                <i class="ri-menu-3-line"></i>
+              </div>
+            </div>
+            <div class="searchbar-container" id="search-container">
+              <input
+                type="search"
+                name="search"
+                class="search-input"
+                placeholder="Search..."
+                id="search-box"
+                tabindex="3"
+                autocomplete="off"
+                accesskey="s"
+              /><label class="search-icon" for="search" id="search">
+                <i class="ri-search-line"></i>
+              </label>
+            </div>
+          </div>
+          <div class="btn-container">
+            <a
+              href="create-post.html"
+              class="navbar-icon"
+              id="create-post-icon"
+              tabindex="4"
+              accesskey="c"
+            >
+              <i class="ri-add-box-line"></i>
+            </a>
+            <div
+              class="navbar-icon"
+              id="notification-icon"
+              tabindex="5"
+              accesskey="n"
+            >
+              <i class="ri-notification-3-line"></i>
+            </div>
+            <a
+              href="profile.html"
+              class="navbar-icon"
+              id="profile-icon"
+              tabindex="6"
+              accesskey="p"
+            >
+              <div class="profile-img" id="profile-img">
+                <img
+                  src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                  alt=""
+                />
+              </div>
+            </a>
+          </div>
+        </nav>
+        <nav class="sidebar" id="sidebar">
+          <div class="nav-logo-container">
+            <h1 class="nav-logo">
+              <a
+                href="index.html"
+                tabindex="1"
+                accesskey="q"
+                id="nav-logo"
+                >O<span class="visible"></span
+              ></a>
+            </h1>
+            <div class="navbar-icon close-icon" id="close-sidebar">
+              <i class="ri-close-line"></i>
+            </div>
+          </div>
+          <div class="sidebar-wrapper">
+            <div class="top-wrapper">
+              <ul class="sidebar-list sidebar-list-mobile">
+                <li class="sidebar-item sidebar-item-search">
+                  <div
+                    class="mobile-searchbar-container"
+                    id="mobile-search-container"
+                  >
+                    <input
+                      type="search"
+                      name="search"
+                      class="search-input"
+                      placeholder="Search..."
+                      id="mobile-search-box"
+                      tabindex="3"
+                      autocomplete="off"
+                      accesskey="s"
+                    /><label
+                      class="search-icon"
+                      for="search"
+                      id="mobile-search"
+                    >
+                      <i class="ri-search-line"></i>
+                    </label>
+                  </div>
+                </li>
+                <li class="sidebar-item">
+                  <a
+                    href="profile.html"
+                    class="sidebar-icon"
+                    accesskey="p"
+                  >
+                    <i class="ri-user-line"></i>
+                    <span class="sidebar-item-title">Profile</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                  <a href="#" class="sidebar-icon" accesskey="n">
+                    <i class="ri-notification-3-line"></i>
+                    <span class="sidebar-item-title">Notifications</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                  <a
+                    href="create-post.html"
+                    class="sidebar-icon"
+                    accesskey="c"
+                  >
+                    <i class="ri-add-box-line"></i>
+                    <span class="sidebar-item-title">New Post</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+              </ul>
+              <div class="horizontal-rule"></div>
+              <ul class="sidebar-list">
+                <li class="sidebar-item">
+                  <a
+                    href="../templates/home.html"
+                    class="sidebar-icon sidebar-active"
+                    accesskey="h"
+                  >
+                    <i class="ri-home-line"></i>
+                    <span class="sidebar-item-title">Homepage</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                  <a
+                    href="../templates/home.html"
+                    class="sidebar-icon"
+                    accesskey="f"
+                  >
+                    <i class="ri-discuss-line"></i>
+                    <span class="sidebar-item-title">Forums</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                  <a
+                    href="../templates/home.html"
+                    class="sidebar-icon"
+                    accesskey="e"
+                  >
+                    <i class="ri-compass-line"></i>
+                    <span class="sidebar-item-title">Explore</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+              </ul>
+              <div class="horizontal-rule"></div>
+              <ul class="sidebar-list">
+                <li class="sidebar-item">
+                  <a
+                    href="#"
+                    class="sidebar-icon"
+                    id="toggle-icon"
+                    accesskey="d"
+                  ></a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+              </ul>
+            </div>
+            <div class="bottom-wrapper">
+              <ul class="sidebar-list">
+                <li class="sidebar-item">
+                  <a
+                    href="https://github.com/SE-Designs/forum-v2"
+                    class="sidebar-icon"
+                    target="_blank"
+                  >
+                    <i class="ri-external-link-line"></i>
+                    <span class="sidebar-item-title">Source Code</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                  <a
+                    href="settings.html"
+                    class="sidebar-icon"
+                    accesskey="t"
+                  >
+                    <i class="ri-settings-3-line"></i>
+                    <span class="sidebar-item-title">Settings</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                  <a
+                    href="login.html"
+                    class="sidebar-icon"
+                    accesskey="l"
+                  >
+                    <i class="ri-logout-box-line"></i>
+                    <span class="sidebar-item-title">Logout</span>
+                  </a>
+                  <div class="sidebar-active-item"></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <!-- MAIN CONTENT -->
+      <div class="main-back" id="main-back">
+        <div class="main-wrapper">
+          <section class="cards-list">
+            <div class="tags-list">
+              <h5>
+                <a id="sortingBy"
+                  >Latest Topics: <i class="ri-arrow-drop-down-line"></i
+                ></a>
+              </h5>
+              <div class="sort-container" id="sort-container">
+                <ul>
+                  <li class="selected-li" id="sort-container-by">
+                    <a href="#"
+                      ><i class="ri-checkbox-blank-circle-line"></i> New</a
+                    >
+                  </li>
+                  <li id="sort-container-by">
+                    <a href="#"><i class="ri-history-line"></i> Old</a>
+                  </li>
+                  <li id="sort-container-by">
+                    <a href="#"><i class="ri-fire-line"></i> Hot</a>
+                  </li>
+                  <li id="sort-container-by">
+                    <a href="#"><i class="ri-arrow-up-line"></i> Rising</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="horizontal-rule"></div>
+              <ul class="tags-container">
+                <li>
+                  <a href="#" class="tag">dasngs</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">mnywbed</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">ubnds</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">mjgisd</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">dasdas</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">omegas</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">taown</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">loasc</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">mixture</a>
+                </li>
+              </ul>
+            </div>
+            <div class="cards">
+              <div class="card-body">
+                <div class="card-top">
+                  <div class="card-info">
+                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
+                    <p>
+                      <a href="#">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing
+                        elit. Numquam, obcaecati ipsum sapiente soluta rerum
+                        animi! Magni fuga facere quos ea.</a
+                      >
+                    </p>
+                  </div>
+                  <div class="btn-container">
+                    <button class="btn btn-white" id="btn-like">
+                      <i class="ri-thumb-up-line"></i>
+                    </button>
+                    <button class="btn btn-white" id="btn-dislike">
+                      <i class="ri-thumb-down-line"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="horizontal-rule"></div>
+                <div class="card-bottom">
+                  <a href="#" class="card-bottom-left">
+                    <img
+                      src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      alt=""
+                    />
+                    <h4>@mixturegg</h4>
+                  </a>
+                  <a href="post.html" class="card-bottom-right">
+                    <button class="btn btn-black">
+                      4 comments <i class="ri-chat-forward-line"></i>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="cards">
+              <div class="card-body">
+                <div class="card-top">
+                  <div class="card-info">
+                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
+                    <p>
+                      <a href="#">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing
+                        elit. Numquam, obcaecati ipsum sapiente soluta rerum
+                        animi! Magni fuga facere quos ea.</a
+                      >
+                    </p>
+                  </div>
+                  <div class="btn-container">
+                    <button class="btn btn-white" id="btn-like">
+                      <i class="ri-thumb-up-line"></i>
+                    </button>
+                    <button class="btn btn-white" id="btn-dislike">
+                      <i class="ri-thumb-down-line"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="horizontal-rule"></div>
+                <div class="card-bottom">
+                  <a href="#" class="card-bottom-left">
+                    <img
+                      src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      alt=""
+                    />
+                    <h4>@mixturegg</h4>
+                  </a>
+                  <a href="post.html" class="card-bottom-right">
+                    <button class="btn btn-black">
+                      13 comments <i class="ri-chat-forward-line"></i>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="cards">
+              <div class="card-body">
+                <div class="card-top">
+                  <div class="card-info">
+                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
+                    <p>
+                      <a href="#">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing
+                        elit. Numquam, obcaecati ipsum sapiente soluta rerum
+                        animi! Magni fuga facere quos ea.</a
+                      >
+                    </p>
+                  </div>
+                  <div class="btn-container">
+                    <button class="btn btn-white" id="btn-like">
+                      <i class="ri-thumb-up-line"></i>
+                    </button>
+                    <button class="btn btn-white" id="btn-dislike">
+                      <i class="ri-thumb-down-line"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="horizontal-rule"></div>
+                <div class="card-bottom">
+                  <a href="#" class="card-bottom-left">
+                    <img
+                      src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      alt=""
+                    />
+                    <h4>@mixturegg</h4>
+                  </a>
+                  <a href="post.html" class="card-bottom-right">
+                    <button class="btn btn-black">
+                      20+ comments <i class="ri-chat-forward-line"></i>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+          <aside class="right-aside">
+            <a class="bw-100" href="html"
+              ><button class="btn btn-special bw-100">
+                Start a New Topic
+              </button></a
+            >
+            <section class="tags-card">
+              <h5>Top Users:</h5>
+              <ul>
+                <li>
+                  <a href="#" class="cardtag">
+                    <div class="img-container">
+                      <img
+                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      />
+                      1. @k123n
+                    </div>
+
+                    <div>242 <i class="ri-arrow-right-up-line"></i></div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="cardtag">
+                    <div class="img-container">
+                      <img
+                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      />
+                      2. @kbjdfhd
+                    </div>
+
+                    <div>229 <i class="ri-arrow-right-down-line"></i></div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="cardtag">
+                    <div class="img-container">
+                      <img
+                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      />
+                      3. @pp[;e,]
+                    </div>
+
+                    <div>218 <i class="ri-arrow-right-up-line"></i></div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="cardtag">
+                    <div class="img-container">
+                      <img
+                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      />
+                      4. @ms8adj
+                    </div>
+
+                    <div>210 <i class="ri-arrow-right-down-line"></i></div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="cardtag">
+                    <div class="img-container">
+                      <img
+                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      />
+                      5. @daswq
+                    </div>
+
+                    <div>194 <i class="ri-arrow-right-line"></i></div>
+                  </a>
+                </li>
+                <div class="horizontal-rule"></div>
+                <li>
+                  <a href="#" class="cardtag">
+                    <div class="img-container">
+                      <img
+                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                      />
+                      8. @ayaks
+                    </div>
+
+                    <div>178 <i class="ri-arrow-right-up-line"></i></div>
+                  </a>
+                </li>
+              </ul>
+            </section>
+            <section class="tags-card">
+              <h5>Trending Topics:</h5>
+              <ul>
+                <li>
+                  <a href="#" class="tag">dasngs</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">mnywbed</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">ubnds</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">mjgisd</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">dasdas</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">omegas</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">taown</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">loasc</a>
+                </li>
+                <li>
+                  <a href="#" class="tag">mixture</a>
+                </li>
+              </ul>
+            </section>
+          </aside>
+        </div>
+      </div>
+      <div class="notifications" id="notifications">
+        <h6>No New Notifications</h6>
+        <ul>
+          <li><a href="#"></a></li>
+        </ul>
+      </div>
+    </main>
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/app.js"></script>
+    <script src="../scripts/home.js"></script>
+  </body>
+</html>
