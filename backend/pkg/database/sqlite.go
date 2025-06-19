@@ -1,13 +1,16 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"forum/internal/config"
+)
 
 type SQLite struct {
 	db *sql.DB
 }
 
-func NewSQLite() (*SQLite, error) {
-	db, err := sql.Open("sqlite3", "./store.db")
+func NewSQLite(cfg config.DatabaseConfig) (*SQLite, error) {
+	db, err := sql.Open(cfg.Driver, cfg.Path)
 	if err != nil {
 		return nil, err
 	}
