@@ -69,3 +69,15 @@ func (r repository) AssignToPost(postID uuid.UUID, categoryIDs []uuid.UUID) erro
 	}
 	return tx.Commit()
 }
+
+func (r *repository) ExistsByName(name string) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM categories WHERE name = ?)", name).Scan(&exists)
+	return exists, err
+}
+
+func (r *repository) ExistsByID(id uuid.UUID) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM categories WHERE id = ?)", id.String()).Scan(&exists)
+	return exists, err
+}
