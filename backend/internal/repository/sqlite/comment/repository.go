@@ -91,3 +91,27 @@ func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error
 	}
 	return nil
 }
+
+func (r *repository) ExistsByID(id uuid.UUID) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM comments WHERE id = ?)",
+		id.String()).Scan(&exists)
+	return exists, err
+}
+
+func (r *repository) GetReaction(commentID, userID uuid.UUID) (int, error) {
+	var reaction int
+	err := r.db.QueryRow(
+		"SELECT reaction FROM comment_reactions WHERE comment_id = ? AND user_id = ?",
+		commentID.String(), userID.String(),
+	).Scan(&reaction)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, ErrReactionNotFound
+		}
+		return 0, fmt.Errorf("%w: %v", ErrGetReactionFailed, err)
+	}
+
+	return reaction, nil
+}
