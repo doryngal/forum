@@ -5,20 +5,17 @@ import (
 	"forum/internal/domain"
 	category_repo "forum/internal/repository/sqlite/category"
 	post_repo "forum/internal/repository/sqlite/post"
+	"forum/internal/service/category/validator"
 	"github.com/google/uuid"
 )
 
 type service struct {
 	repo      category_repo.Repository
 	postRepo  post_repo.Repository
-	validator Validator
+	validator validator.CategoryValidator
 }
 
-type Validator interface {
-	ValidateCategoryName(name string) error
-}
-
-func New(repo category_repo.Repository, postRepo post_repo.Repository, validator Validator) Service {
+func New(repo category_repo.Repository, postRepo post_repo.Repository, validator validator.CategoryValidator) Service {
 	return &service{
 		repo:      repo,
 		postRepo:  postRepo,
