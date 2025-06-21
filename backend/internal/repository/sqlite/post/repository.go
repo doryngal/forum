@@ -2,6 +2,7 @@ package post
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/domain"
 	"github.com/google/uuid"
 	"time"
@@ -22,7 +23,10 @@ func (r repository) Create(post *domain.Post) error {
 		"INSERT INTO posts (id, user_id, title, content, created_at) VALUES (?, ?, ?, ?, ?)",
 		post.ID.String(), post.UserID.String(), post.Title, post.Content, post.CreatedAt,
 	)
-	return err
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrInsertPostFailed, err)
+	}
+	return nil
 }
 
 func (r repository) GetByID(id uuid.UUID) (*domain.Post, error) {
@@ -45,21 +49,21 @@ func (r repository) GetByID(id uuid.UUID) (*domain.Post, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	p.ID, err = uuid.Parse(idStr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 	}
 	p.UserID, err = uuid.Parse(userIDStr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 	}
 
 	// Load categories for the post
 	categories, err := r.getPostCategories(p.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrLoadCategoriesFailed, err)
 	}
 	p.Categories = categories
 
@@ -73,7 +77,7 @@ func (r repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, err
 		JOIN post_categories pc ON c.id = pc.category_id
 		WHERE pc.post_id = ?`, postID.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -82,11 +86,11 @@ func (r repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, err
 		var c domain.Category
 		var idStr string
 		if err := rows.Scan(&idStr, &c.Name); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
 		}
 		c.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		categories = append(categories, &c)
 	}
@@ -106,7 +110,7 @@ func (r repository) GetAll() ([]*domain.Post, error) {
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -116,15 +120,15 @@ func (r repository) GetAll() ([]*domain.Post, error) {
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -156,7 +160,7 @@ func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) 
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`, categoryID.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -166,15 +170,15 @@ func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) 
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -205,7 +209,7 @@ func (r repository) GetByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`, userID.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -215,15 +219,15 @@ func (r repository) GetByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -254,7 +258,7 @@ func (r repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`, userID.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -264,15 +268,15 @@ func (r repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -303,5 +307,5 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 		VALUES (?, ?, ?)
 		ON CONFLICT(user_id, post_id) DO UPDATE SET reaction = excluded.reaction`,
 		userID.String(), postID.String(), reaction)
-	return err
+	return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
 }
