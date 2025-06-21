@@ -2,6 +2,7 @@ package comment
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/domain"
 	"github.com/google/uuid"
 	"time"
@@ -18,11 +19,15 @@ func New(db *sql.DB) Repository {
 func (r repository) Create(comment *domain.Comment) error {
 	comment.ID = uuid.New()
 	comment.CreatedAt = time.Now()
+
 	_, err := r.db.Exec(
 		"INSERT INTO comments (id, post_id, user_id, content, created_at) VALUES (?, ?, ?, ?, ?)",
 		comment.ID.String(), comment.PostID.String(), comment.UserID.String(), comment.Content, comment.CreatedAt,
 	)
-	return err
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrInsertCommentFailed, err)
+	}
+	return nil
 }
 
 func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
@@ -38,7 +43,7 @@ func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
 		GROUP BY c.id
 		ORDER BY c.created_at DESC`, postID.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -48,19 +53,19 @@ func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
 		var idStr, postIDStr, userIDStr string
 		if err := rows.Scan(&idStr, &postIDStr, &userIDStr, &c.Content,
 			&c.CreatedAt, &c.AuthorUsername, &c.Likes, &c.Dislikes); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
 		}
 		c.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		c.PostID, err = uuid.Parse(postIDStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		c.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
 		}
 		comments = append(comments, &c)
 	}
@@ -81,5 +86,8 @@ func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error
 		VALUES (?, ?, ?)
 		ON CONFLICT(user_id, comment_id) DO UPDATE SET reaction = excluded.reaction`,
 		userID.String(), commentID.String(), reaction)
-	return err
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+	}
+	return nil
 }
