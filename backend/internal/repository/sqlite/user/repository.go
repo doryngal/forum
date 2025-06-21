@@ -92,3 +92,15 @@ func (r repository) IsEmailTaken(email string) (bool, error) {
 
 	return exists, nil
 }
+
+func (r *repository) ExistsByID(id uuid.UUID) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)",
+		id.String(),
+	).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+	}
+	return exists, nil
+}
