@@ -1,3 +1,4 @@
+// domain/models.go
 package domain
 
 import (
@@ -21,11 +22,16 @@ type Session struct {
 }
 
 type Post struct {
-	ID        uuid.UUID `json:"id"`
-	UserID    uuid.UUID `json:"user_id"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
+	ID             uuid.UUID   `json:"id"`
+	UserID         uuid.UUID   `json:"user_id"`
+	Title          string      `json:"title"`
+	Content        string      `json:"content"`
+	CreatedAt      time.Time   `json:"created_at"`
+	AuthorUsername string      `json:"author_username"`
+	Likes          int         `json:"likes"`
+	Dislikes       int         `json:"dislikes"`
+	CommentsCount  int         `json:"comments_count"`
+	Categories     []*Category `json:"categories,omitempty"`
 }
 
 type Category struct {
@@ -39,11 +45,14 @@ type PostCategory struct {
 }
 
 type Comment struct {
-	ID        uuid.UUID `json:"id"`
-	PostID    uuid.UUID `json:"post_id"`
-	UserID    uuid.UUID `json:"user_id"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
+	ID             uuid.UUID `json:"id"`
+	PostID         uuid.UUID `json:"post_id"`
+	UserID         uuid.UUID `json:"user_id"`
+	Content        string    `json:"content"`
+	CreatedAt      time.Time `json:"created_at"`
+	AuthorUsername string    `json:"author_username"`
+	Likes          int       `json:"likes"`
+	Dislikes       int       `json:"dislikes"`
 }
 
 type PostReaction struct {
