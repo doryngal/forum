@@ -43,6 +43,27 @@ func (s *service) RegisterUser(user *domain.User) error {
 	return s.repo.Create(user)
 }
 
+func (s *service) Login(email, password string) (*domain.User, error) {
+	if err := s.validator.ValidateEmail(email); err != nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	user, err := s.repo.FindByEmail(email)
+	if err != nil {
+		if errors.Is(err, user_repo.ErrQueryFailed) {
+			return nil, ErrInvalidCredentials
+		}
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	return user, nil
+}
+
 func (s *service) GetUserByEmail(email string) (*domain.User, error) {
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {

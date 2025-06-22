@@ -4,6 +4,7 @@ import (
 	"errors"
 	"forum/internal/domain"
 	"net/mail"
+	"regexp"
 	"strings"
 )
 
@@ -50,6 +51,19 @@ func (v *userValidator) ValidatePassword(password string) error {
 	}
 	if !hasSymbolOrDigit {
 		return ErrPasswordTooWeak
+	}
+	return nil
+}
+
+func (v *userValidator) ValidateEmail(email string) error {
+	email = strings.TrimSpace(email)
+	if email == "" {
+		return ErrInvalidEmail
+	}
+
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	if !re.MatchString(email) {
+		return ErrInvalidEmail
 	}
 	return nil
 }
