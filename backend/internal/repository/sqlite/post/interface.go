@@ -15,4 +15,5 @@ type Repository interface {
 	Like(postID, userID uuid.UUID) error
 	Dislike(postID, userID uuid.UUID) error
 	ExistsByID(postID uuid.UUID) (bool, error)
+	GetReaction(postID, userID uuid.UUID) (int, error)
 }

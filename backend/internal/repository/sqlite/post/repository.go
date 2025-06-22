@@ -316,3 +316,20 @@ func (r repository) ExistsByID(postID uuid.UUID) (bool, error) {
 		postID.String()).Scan(&exists)
 	return exists, err
 }
+
+func (r repository) GetReaction(postID, userID uuid.UUID) (int, error) {
+	var reaction int
+	err := r.db.QueryRow(
+		"SELECT reaction FROM post_reactions WHERE post_id = ? AND user_id = ?",
+		postID.String(), userID.String(),
+	).Scan(&reaction)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, ErrReactionNotFound
+		}
+		return 0, fmt.Errorf("%w: %v", ErrGetReactionFailed, err)
+	}
+
+	return reaction, nil
+}

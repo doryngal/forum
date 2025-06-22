@@ -9,4 +9,6 @@ var (
 	ErrUUIDParseFailed      = errors.New("post: failed to parse UUID")
 	ErrLoadCategoriesFailed = errors.New("post: failed to load categories")
 	ErrReactionUpdateFailed = errors.New("post: failed to update reaction")
+	ErrReactionNotFound     = errors.New("post: reaction not found")
+	ErrGetReactionFailed    = errors.New("post: failed to get reaction")
 )
