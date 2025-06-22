@@ -1,35 +1,74 @@
 package user
 
 import (
+	"errors"
 	"forum/internal/domain"
 	user_repo "forum/internal/repository/sqlite/user"
+	"forum/internal/service/user/validator"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type service struct {
-	repo user_repo.Repository
+	repo      user_repo.Repository
+	validator validator.UserValidator
 }
 
-func New(repo user_repo.Repository) Service {
-	return &service{repo: repo}
+func New(repo user_repo.Repository, validator validator.UserValidator) Service {
+	return &service{
+		repo:      repo,
+		validator: validator,
+	}
 }
 
-func (s service) RegisterUser(user *domain.User) error {
-	//TODO implement me
-	panic("implement me")
+func (s *service) RegisterUser(user *domain.User) error {
+	if err := s.validator.ValidateUser(user); err != nil {
+		return err
+	}
+
+	taken, err := s.repo.IsEmailTaken(user.Email)
+	if err != nil {
+		return err
+	}
+	if taken {
+		return ErrEmailTaken
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.PasswordHash = string(hashedPassword)
+
+	return s.repo.Create(user)
 }
 
-func (s service) GetUserByEmail(email string) (*domain.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) GetUserByEmail(email string) (*domain.User, error) {
+	user, err := s.repo.FindByEmail(email)
+	if err != nil {
+		if errors.Is(err, user_repo.ErrQueryFailed) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return user, nil
 }
 
-func (s service) GetUserByID(id uuid.UUID) (*domain.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) GetUserByID(id uuid.UUID) (*domain.User, error) {
+	if id == uuid.Nil {
+		return nil, ErrInvalidUser
+	}
+
+	user, err := s.repo.FindByID(id)
+	if err != nil {
+		if errors.Is(err, user_repo.ErrQueryFailed) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return user, nil
 }
 
-func (s service) IsEmailTaken(email string) (bool, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) IsEmailTaken(email string) (bool, error) {
+	return s.repo.IsEmailTaken(email)
 }
