@@ -14,4 +14,5 @@ type Repository interface {
 	GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error)
 	Like(postID, userID uuid.UUID) error
 	Dislike(postID, userID uuid.UUID) error
+	ExistsByID(postID uuid.UUID) (bool, error)
 }

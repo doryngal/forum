@@ -309,3 +309,10 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 		userID.String(), postID.String(), reaction)
 	return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
 }
+
+func (r repository) ExistsByID(postID uuid.UUID) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM posts WHERE id = ?)",
+		postID.String()).Scan(&exists)
+	return exists, err
+}
