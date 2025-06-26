@@ -363,267 +363,72 @@
               </div>
               <div class="horizontal-rule"></div>
               <ul class="tags-container">
+                {{range .Categories}}
                 <li>
-                  <a href="#" class="tag">dasngs</a>
+                  <a href="#" class="tag">{{.Name}}</a>
                 </li>
-                <li>
-                  <a href="#" class="tag">mnywbed</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">ubnds</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">mjgisd</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">dasdas</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">omegas</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">taown</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">loasc</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">mixture</a>
-                </li>
+                {{end}}
               </ul>
             </div>
+
+            {{range .Posts}}
             <div class="cards">
               <div class="card-body">
                 <div class="card-top">
                   <div class="card-info">
-                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
+                    <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
                     <p>
-                      <a href="#">
-                        Lorem ipsum dolor sit, amet consectetur adipisicing
-                        elit. Numquam, obcaecati ipsum sapiente soluta rerum
-                        animi! Magni fuga facere quos ea.</a
-                      >
+                      <a href="/post/{{.ID}}">
+                        {{.Content}}
+                      </a>
                     </p>
                   </div>
                   <div class="btn-container">
-                    <button class="btn btn-white" id="btn-like">
+                    <button class="btn btn-white btn-like" data-post-id="{{.ID}}">
                       <i class="ri-thumb-up-line"></i>
+                      <span class="like-count">{{.Likes}}</span>
                     </button>
-                    <button class="btn btn-white" id="btn-dislike">
+                    <button class="btn btn-white btn-dislike" data-post-id="{{.ID}}">
                       <i class="ri-thumb-down-line"></i>
+                      <span class="dislike-count">{{.Dislikes}}</span>
                     </button>
                   </div>
                 </div>
                 <div class="horizontal-rule"></div>
                 <div class="card-bottom">
-                  <a href="#" class="card-bottom-left">
+                  <a href="/user/{{.UserID}}" class="card-bottom-left">
                     <img
-                      src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      alt=""
+                            src="https://source.boringavatars.com/beam/40/{{.AuthorUsername}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
+                            alt=""
                     />
-                    <h4>@mixturegg</h4>
+                    <h4>@{{.AuthorUsername}}</h4>
                   </a>
-                  <a href="post.html" class="card-bottom-right">
+                  <a href="/post/{{.ID}}" class="card-bottom-right">
                     <button class="btn btn-black">
-                      4 comments <i class="ri-chat-forward-line"></i>
+                      {{.CommentsCount}} comments <i class="ri-chat-forward-line"></i>
                     </button>
                   </a>
                 </div>
               </div>
             </div>
-            <div class="cards">
-              <div class="card-body">
-                <div class="card-top">
-                  <div class="card-info">
-                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
-                    <p>
-                      <a href="#">
-                        Lorem ipsum dolor sit, amet consectetur adipisicing
-                        elit. Numquam, obcaecati ipsum sapiente soluta rerum
-                        animi! Magni fuga facere quos ea.</a
-                      >
-                    </p>
-                  </div>
-                  <div class="btn-container">
-                    <button class="btn btn-white" id="btn-like">
-                      <i class="ri-thumb-up-line"></i>
-                    </button>
-                    <button class="btn btn-white" id="btn-dislike">
-                      <i class="ri-thumb-down-line"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="horizontal-rule"></div>
-                <div class="card-bottom">
-                  <a href="#" class="card-bottom-left">
-                    <img
-                      src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      alt=""
-                    />
-                    <h4>@mixturegg</h4>
-                  </a>
-                  <a href="post.html" class="card-bottom-right">
-                    <button class="btn btn-black">
-                      13 comments <i class="ri-chat-forward-line"></i>
-                    </button>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="cards">
-              <div class="card-body">
-                <div class="card-top">
-                  <div class="card-info">
-                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
-                    <p>
-                      <a href="#">
-                        Lorem ipsum dolor sit, amet consectetur adipisicing
-                        elit. Numquam, obcaecati ipsum sapiente soluta rerum
-                        animi! Magni fuga facere quos ea.</a
-                      >
-                    </p>
-                  </div>
-                  <div class="btn-container">
-                    <button class="btn btn-white" id="btn-like">
-                      <i class="ri-thumb-up-line"></i>
-                    </button>
-                    <button class="btn btn-white" id="btn-dislike">
-                      <i class="ri-thumb-down-line"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="horizontal-rule"></div>
-                <div class="card-bottom">
-                  <a href="#" class="card-bottom-left">
-                    <img
-                      src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      alt=""
-                    />
-                    <h4>@mixturegg</h4>
-                  </a>
-                  <a href="post.html" class="card-bottom-right">
-                    <button class="btn btn-black">
-                      20+ comments <i class="ri-chat-forward-line"></i>
-                    </button>
-                  </a>
-                </div>
-              </div>
-            </div>
+            {{end}}
+
           </section>
           <aside class="right-aside">
-            <a class="bw-100" href="html"
-              ><button class="btn btn-special bw-100">
+            <a class="bw-100" href="/create-post">
+              <button class="btn btn-special bw-100">
                 Start a New Topic
-              </button></a
-            >
-            <section class="tags-card">
-              <h5>Top Users:</h5>
-              <ul>
-                <li>
-                  <a href="#" class="cardtag">
-                    <div class="img-container">
-                      <img
-                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      />
-                      1. @k123n
-                    </div>
+              </button>
+            </a>
 
-                    <div>242 <i class="ri-arrow-right-up-line"></i></div>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="cardtag">
-                    <div class="img-container">
-                      <img
-                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      />
-                      2. @kbjdfhd
-                    </div>
-
-                    <div>229 <i class="ri-arrow-right-down-line"></i></div>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="cardtag">
-                    <div class="img-container">
-                      <img
-                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      />
-                      3. @pp[;e,]
-                    </div>
-
-                    <div>218 <i class="ri-arrow-right-up-line"></i></div>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="cardtag">
-                    <div class="img-container">
-                      <img
-                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      />
-                      4. @ms8adj
-                    </div>
-
-                    <div>210 <i class="ri-arrow-right-down-line"></i></div>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="cardtag">
-                    <div class="img-container">
-                      <img
-                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      />
-                      5. @daswq
-                    </div>
-
-                    <div>194 <i class="ri-arrow-right-line"></i></div>
-                  </a>
-                </li>
-                <div class="horizontal-rule"></div>
-                <li>
-                  <a href="#" class="cardtag">
-                    <div class="img-container">
-                      <img
-                        src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                      />
-                      8. @ayaks
-                    </div>
-
-                    <div>178 <i class="ri-arrow-right-up-line"></i></div>
-                  </a>
-                </li>
-              </ul>
-            </section>
             <section class="tags-card">
               <h5>Trending Topics:</h5>
               <ul>
+                {{range .Categories}}
                 <li>
-                  <a href="#" class="tag">dasngs</a>
+                  <a href="#" class="tag">{{.Name}}</a>
                 </li>
-                <li>
-                  <a href="#" class="tag">mnywbed</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">ubnds</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">mjgisd</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">dasdas</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">omegas</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">taown</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">loasc</a>
-                </li>
-                <li>
-                  <a href="#" class="tag">mixture</a>
-                </li>
+                {{end}}
               </ul>
             </section>
           </aside>
@@ -636,6 +441,48 @@
         </ul>
       </div>
     </main>
+    <script>
+      // Add JavaScript for handling likes/dislikes
+      document.querySelectorAll('.btn-like').forEach(button => {
+        button.addEventListener('click', async function() {
+          const postId = this.dataset.postId;
+          try {
+            const response = await fetch(`/api/posts/${postId}/like`, {
+              method: 'POST',
+              credentials: 'include'
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              this.querySelector('.like-count').textContent = data.likes;
+              // You might also want to update the dislike count if user had disliked before
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        });
+      });
+
+      // Similar for dislike button
+      document.querySelectorAll('.btn-dislike').forEach(button => {
+        button.addEventListener('click', async function() {
+          const postId = this.dataset.postId;
+          try {
+            const response = await fetch(`/api/posts/${postId}/dislike`, {
+              method: 'POST',
+              credentials: 'include'
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              this.querySelector('.dislike-count').textContent = data.dislikes;
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        });
+      });
+    </script>
     <script src="../scripts/main.js"></script>
     <script src="../scripts/app.js"></script>
     <script src="../scripts/home.js"></script>
