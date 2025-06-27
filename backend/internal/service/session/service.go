@@ -95,6 +95,17 @@ func (s *service) Delete(token string) error {
 	return nil
 }
 
+func (s *service) DeleteByUserID(userID uuid.UUID) error {
+	if err := s.repo.DeleteByUserID(userID); err != nil {
+		if errors.Is(err, session_repo.ErrSessionNotFound) {
+			return errors.Join(ErrSessionNotFound, err)
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (s *service) CleanupExpired() error {
 	return s.repo.DeleteExpiredBefore(time.Now())
 }
