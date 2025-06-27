@@ -42,7 +42,7 @@ func LoadConfig() Config {
 		},
 		Database: DatabaseConfig{
 			Driver: getEnv("DATABASE_DRIVER", "sqlite3"),
-			Path:   getEnv("DB_PATH", "./store.db"),
+			Path:   getEnv("DB_PATH", "./../backend/forum.db"),
 		},
 		Session: SessionConfig{
 			CookieName:     getEnv("COOKIE_NAME", "session_id"),
