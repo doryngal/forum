@@ -104,3 +104,50 @@ func (r *repository) ExistsByID(id uuid.UUID) (bool, error) {
 	}
 	return exists, nil
 }
+
+func (r *repository) FindByUsername(username string) (*domain.User, error) {
+	var u domain.User
+	var idStr string
+
+	err := r.db.QueryRow(
+		"SELECT id, email, username, password_hash, created_at FROM users WHERE username = ?",
+		username,
+	).Scan(&idStr, &u.Email, &u.Username, &u.PasswordHash, &u.CreatedAt)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+	}
+
+	u.ID, err = uuid.Parse(idStr)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+	}
+
+	return &u, nil
+}
+
+func (r *repository) GetStats(userID uuid.UUID) (*domain.UserStats, error) {
+	var stats domain.UserStats
+
+	err := r.db.QueryRow(`
+		SELECT 
+			(SELECT COUNT(*) FROM posts WHERE user_id = ?),
+			(SELECT COUNT(*) FROM comments WHERE user_id = ?),
+			(SELECT COUNT(*) FROM post_reactions pr 
+			 JOIN posts p ON pr.post_id = p.id 
+			 WHERE p.user_id = ? AND pr.reaction = 1),
+			(SELECT COUNT(*) FROM post_reactions pr 
+			 JOIN posts p ON pr.post_id = p.id 
+			 WHERE p.user_id = ? AND pr.reaction = -1)
+	`, userID.String(), userID.String(), userID.String(), userID.String(),
+	).Scan(&stats.PostCount, &stats.CommentCount, &stats.LikeCount, &stats.DislikeCount)
+
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+	}
+
+	return &stats, nil
+}
