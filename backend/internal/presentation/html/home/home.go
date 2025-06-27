@@ -59,7 +59,7 @@ func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
 		Categories: categories,
 	}
 
-	if err := h.tmpl.ExecuteTemplate(w, "home/index.html", data); err != nil {
-		http.Error(w, "Failed to render template", http.StatusInternalServerError)
+	if err := h.tmpl.ExecuteTemplate(w, "home.html", data); err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 	}
 }
