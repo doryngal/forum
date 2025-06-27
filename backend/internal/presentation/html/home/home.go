@@ -1,7 +1,6 @@
 package home
 
 import (
-	"fmt"
 	"forum/internal/domain"
 	"forum/internal/service/category"
 	"forum/internal/service/post"
@@ -11,13 +10,15 @@ import (
 )
 
 type HomeHandler struct {
+	tmpl            *template.Template
 	postService     post.Service
 	userService     user.Service
 	categoryService category.Service
 }
 
-func NewHomeHandler(ps post.Service, us user.Service, cs category.Service) *HomeHandler {
+func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service) *HomeHandler {
 	return &HomeHandler{
+		tmpl:            tmpl,
 		postService:     ps,
 		userService:     us,
 		categoryService: cs,
@@ -25,44 +26,40 @@ func NewHomeHandler(ps post.Service, us user.Service, cs category.Service) *Home
 }
 
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Get all posts
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	h.handleHome(w, r)
+}
+
+func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
 	posts, err := h.postService.GetAllPosts()
 	if err != nil {
-		http.Error(w, "Error fetching posts", http.StatusInternalServerError)
+		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
 		return
 	}
 
-	// Get top categories (trending topics)
 	categories, err := h.categoryService.GetAllCategories()
 	if err != nil {
-		http.Error(w, "Error fetching categories", http.StatusInternalServerError)
-		return
+		categories = nil
 	}
 
-	// Get top users (you might need to implement this in user service)
-	// topUsers, err := h.userService.GetTopUsers(5)
-
-	// Create template data
 	data := struct {
 		Posts      []*domain.Post
 		Categories []*domain.Category
-		// TopUsers   []*domain.User
 	}{
 		Posts:      posts,
 		Categories: categories,
-		// TopUsers:   topUsers,
 	}
 
-	// Render template
-	tmpl, err := template.ParseFiles("templates/home.html")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error parsing template: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error executing template: %v", err), http.StatusInternalServerError)
-		return
+	if err := h.tmpl.ExecuteTemplate(w, "home/index.html", data); err != nil {
+		http.Error(w, "Failed to render template", http.StatusInternalServerError)
 	}
 }
