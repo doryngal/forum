@@ -23,7 +23,9 @@
                 </label>
             </div>
         </div>
+
         <div class="btn-container">
+            {{if .User}}
             <a href="/create-post" class="navbar-icon" id="create-post-icon" tabindex="4" accesskey="c">
                 <i class="ri-add-box-line"></i>
             </a>
@@ -32,9 +34,18 @@
             </a>
             <a href="/profile" class="navbar-icon" id="profile-icon" tabindex="6" accesskey="p">
                 <div class="profile-img" id="profile-img">
-                    <img src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="Profile" />
+                    <img src="https://source.boringavatars.com/beam/40/{{.User.Username}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="Profile" />
                 </div>
             </a>
+            <a href="/logout" class="btn btn-secondary" style="margin-left: 10px;">Logout</a>
+            {{else}}
+            <a href="/login">
+                <button class="btn btn-primary" id="btn-login">Login</button>
+            </a>
+            <a href="/register">
+                <button class="btn btn-secondary" id="btn-register">Register</button>
+            </a>
+            {{end}}
         </div>
     </nav>
     {{template "sidebar" .}}
