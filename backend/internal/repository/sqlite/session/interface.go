@@ -11,5 +11,6 @@ type Repository interface {
 	GetByToken(token string) (*domain.Session, error)
 	GetByUserID(userID uuid.UUID) (*domain.Session, error)
 	Delete(token string) error
+	DeleteByUserID(userID uuid.UUID) error
 	DeleteExpiredBefore(t time.Time) error
 }
