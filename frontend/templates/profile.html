@@ -20,117 +20,64 @@
       <div class="main-back" id="main-back">
         <div class="main-wrapper">
           <div class="btn-container">
-            <button
-              class="btn btn-primary btn-back"
-              id="btn-back"
-              accesskey="b"
-              title="Go Back"
-            >
+            <a href="/" class="btn btn-primary btn-back" id="btn-back" accesskey="b" title="Go Back">
               <i class="ri-arrow-go-back-line"></i>
-            </button>
-          </div>
-          <div class="profile-container">
-            <a href="/profile" class="img-profile">
-              <img
-                src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                alt="Profile"
-              />
-              <strong>doryngal</strong>
             </a>
+          </div>
+
+          <div class="profile-container">
+            <div class="img-profile">
+              <img src="https://source.boringavatars.com/beam/120/{{.User.Username}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="{{.User.Username}}" />
+              <strong>{{.User.Username}}</strong>
+              <span>Member since {{.User.CreatedAt.Format "Jan 2, 2006"}}</span>
+            </div>
+
             <div class="horizontal-rule"></div>
+
             <div class="info-profile">
-              <a href="#" class="info-profile-box active">
-                <h6 id="created-posts">11</h6>
+              <a href="#posts" class="info-profile-box active">
+                <h6 id="created-posts">{{.Stats.PostCount}}</h6>
                 <span>Created Posts</span>
               </a>
-              <a href="#" class="info-profile-box">
-                <h6 id="liked-posts">26</h6>
+              <a href="#liked" class="info-profile-box">
+                <h6 id="liked-posts">{{.Stats.LikeCount}}</h6>
                 <span>Liked Posts</span>
               </a>
-              <a href="#" class="info-profile-box">
-                <h6 id="disliked-posts">9</h6>
+              <a href="#disliked" class="info-profile-box">
+                <h6 id="disliked-posts">{{.Stats.DislikeCount}}</h6>
                 <span>Disliked Posts</span>
               </a>
-              <a href="#" class="info-profile-box">
-                <h6 id="commented-posts">54</h6>
+              <a href="#comments" class="info-profile-box">
+                <h6 id="commented-posts">{{.Stats.CommentCount}}</h6>
                 <span>Comments</span>
               </a>
             </div>
           </div>
-          <section class="posts">
-            <h3>Posts, created by @doryngal</h3>
+
+          <section class="posts" id="posts">
+            <h3>Posts by @{{.User.Username}}</h3>
+
+            {{if .Posts}}
+            {{range .Posts}}
             <div class="post-card">
-              <img
-                src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                alt="Profile"
-              />
+              <img src="https://source.boringavatars.com/beam/40/{{.AuthorUsername}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="{{.AuthorUsername}}" />
               <div class="post-card-info">
-                <h4 id="title"><a href="#">Lorem ipsum dolor sit.</a></h4>
-                <p>
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                  Autem sint quam numquam. Minima dicta facilis impedit! Quidem
-                  facilis fuga voluptates!
-                </p>
+                <h4><a href="/post/{{.ID}}">{{.Title}}</a></h4>
+<!--                <p>{{truncate .Content 200}}</p>-->
                 <div class="right">
-                  <a href="#"
-                    ><button class="btn btn-white">
+                  <a href="/post/{{.ID}}">
+                    <button class="btn btn-white">
                       Continue Reading
-                      <i class="ri-arrow-drop-right-line"></i></button
-                  ></a>
+                      <i class="ri-arrow-drop-right-line"></i>
+                    </button>
+                  </a>
                 </div>
               </div>
             </div>
-            <div class="post-card">
-              <img
-                src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                alt="Profile"
-              />
-              <div class="post-card-info">
-                <h4 id="title">
-                  <a href="#">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Expedita?</a
-                  >
-                </h4>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia
-                  facilis voluptas repellat quae, laudantium asperiores fuga!
-                  Quisquam numquam, esse voluptas eos architecto placeat
-                  consequatur.
-                </p>
-                <div class="right">
-                  <a href="#"
-                    ><button class="btn btn-white">
-                      Continue Reading
-                      <i class="ri-arrow-drop-right-line"></i></button
-                  ></a>
-                </div>
-              </div>
-            </div>
-            <div class="post-card">
-              <img
-                src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                alt="Profile"
-              />
-              <div class="post-card-info">
-                <h4 id="title">
-                  <a href="#">Lorem ipsum dolor sit amet consectetur.</a>
-                </h4>
-                <p>
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ex
-                  impedit ullam temporibus consequuntur quam, sit nobis ea,
-                  quaerat quibusdam harum praesentium nihil placeat ut sint
-                  adipisci veniam. Eos, tempora!
-                </p>
-                <div class="right">
-                  <a href="#"
-                    ><button class="btn btn-white">
-                      Continue Reading
-                      <i class="ri-arrow-drop-right-line"></i></button
-                  ></a>
-                </div>
-              </div>
-            </div>
+            {{end}}
+            {{else}}
+            <p class="no-posts">No posts yet.</p>
+            {{end}}
           </section>
         </div>
       </div>
