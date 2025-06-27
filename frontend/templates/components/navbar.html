@@ -1,0 +1,42 @@
+{{define "navbar"}}
+<header class="header-with-side" id="header">
+    <nav class="navbar" id="navbar">
+        <div class="left-wrapper">
+            <div class="sidebar-container">
+                <div class="navbar-icon" tabindex="2" id="toggleside">
+                    <i class="ri-menu-3-line"></i>
+                </div>
+            </div>
+            <div class="searchbar-container" id="search-container">
+                <input
+                        type="search"
+                        name="search"
+                        class="search-input"
+                        placeholder="Search..."
+                        id="search-box"
+                        tabindex="3"
+                        autocomplete="off"
+                        accesskey="s"
+                />
+                <label class="search-icon" for="search" id="search">
+                    <i class="ri-search-line"></i>
+                </label>
+            </div>
+        </div>
+        <div class="btn-container">
+            <a href="/create-post" class="navbar-icon" id="create-post-icon" tabindex="4" accesskey="c">
+                <i class="ri-add-box-line"></i>
+            </a>
+            <a href="/notifications" class="navbar-icon" id="notification-icon" tabindex="5" accesskey="n">
+                <i class="ri-notification-3-line"></i>
+            </a>
+            <a href="/profile" class="navbar-icon" id="profile-icon" tabindex="6" accesskey="p">
+                <div class="profile-img" id="profile-img">
+                    <img src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="Profile" />
+                </div>
+            </a>
+        </div>
+    </nav>
+    {{template "sidebar" .}}
+</header>
+{{end}}

@@ -1,0 +1,112 @@
+{{define "sidebar"}}
+<nav class="sidebar" id="sidebar">
+    <div class="nav-logo-container">
+        <h1 class="nav-logo">
+            <a href="/" tabindex="1" accesskey="q" id="nav-logo">O<span class="visible"></span></a>
+        </h1>
+        <div class="navbar-icon close-icon" id="close-sidebar">
+            <i class="ri-close-line"></i>
+        </div>
+    </div>
+    <div class="sidebar-wrapper">
+        <div class="top-wrapper">
+            <ul class="sidebar-list sidebar-list-mobile">
+                <li class="sidebar-item sidebar-item-search">
+                    <div class="mobile-searchbar-container" id="mobile-search-container">
+                        <input
+                                type="search"
+                                name="search"
+                                class="search-input"
+                                placeholder="Search..."
+                                id="mobile-search-box"
+                                tabindex="3"
+                                autocomplete="off"
+                                accesskey="s"
+                        />
+                        <label class="search-icon" for="search" id="mobile-search">
+                            <i class="ri-search-line"></i>
+                        </label>
+                    </div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/profile" class="sidebar-icon" accesskey="p">
+                        <i class="ri-user-line"></i>
+                        <span class="sidebar-item-title">Profile</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-icon" accesskey="n">
+                        <i class="ri-notification-3-line"></i>
+                        <span class="sidebar-item-title">Notifications</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/create-post" class="sidebar-icon" accesskey="c">
+                        <i class="ri-add-box-line"></i>
+                        <span class="sidebar-item-title">New Post</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+            </ul>
+            <div class="horizontal-rule"></div>
+            <ul class="sidebar-list">
+                <li class="sidebar-item">
+                    <a href="/" class="sidebar-icon" accesskey="h">
+                        <i class="ri-home-line"></i>
+                        <span class="sidebar-item-title">Homepage</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/forums" class="sidebar-icon" accesskey="f">
+                        <i class="ri-discuss-line"></i>
+                        <span class="sidebar-item-title">Forums</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/explore" class="sidebar-icon" accesskey="e">
+                        <i class="ri-compass-line"></i>
+                        <span class="sidebar-item-title">Explore</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+            </ul>
+            <div class="horizontal-rule"></div>
+            <ul class="sidebar-list">
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-icon" id="toggle-icon" accesskey="d"></a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+            </ul>
+        </div>
+        <div class="bottom-wrapper">
+            <ul class="sidebar-list">
+                <li class="sidebar-item">
+                    <a href="https://github.com/doryngal/forum" class="sidebar-icon" target="_blank">
+                        <i class="ri-external-link-line"></i>
+                        <span class="sidebar-item-title">Source Code</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/settings" class="sidebar-icon" accesskey="t">
+                        <i class="ri-settings-3-line"></i>
+                        <span class="sidebar-item-title">Settings</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/logout" class="sidebar-icon" accesskey="l">
+                        <i class="ri-logout-box-line"></i>
+                        <span class="sidebar-item-title">Logout</span>
+                    </a>
+                    <div class="sidebar-active-item"></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{{end}}
