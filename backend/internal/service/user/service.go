@@ -93,3 +93,35 @@ func (s *service) GetUserByID(id uuid.UUID) (*domain.User, error) {
 func (s *service) IsEmailTaken(email string) (bool, error) {
 	return s.repo.IsEmailTaken(email)
 }
+
+func (s *service) GetUserByUsername(username string) (*domain.User, error) {
+	if username == "" {
+		return nil, ErrInvalidUser
+	}
+
+	user, err := s.repo.FindByUsername(username)
+	if err != nil {
+		if errors.Is(err, user_repo.ErrQueryFailed) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (s *service) GetUserStats(userID uuid.UUID) (*domain.UserStats, error) {
+	if userID == uuid.Nil {
+		return nil, ErrInvalidUser
+	}
+
+	stats, err := s.repo.GetStats(userID)
+	if err != nil {
+		if errors.Is(err, user_repo.ErrQueryFailed) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return stats, nil
+}
