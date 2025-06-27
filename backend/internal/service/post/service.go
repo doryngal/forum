@@ -7,6 +7,7 @@ import (
 	post_repo "forum/internal/repository/sqlite/post"
 	user_repo "forum/internal/repository/sqlite/user"
 	"forum/internal/service/category"
+	"forum/internal/service/post/validator"
 	"forum/internal/service/user"
 	"github.com/google/uuid"
 	"time"
@@ -16,15 +17,11 @@ type service struct {
 	repo         post_repo.Repository
 	userRepo     user_repo.Repository
 	categoryRepo category_repo.Repository
-	validator    Validator
-}
-
-type Validator interface {
-	ValidatePost(post *domain.Post) error
+	validator    validator.PostValidator
 }
 
 func New(repo post_repo.Repository, userRepo user_repo.Repository,
-	categoryRepo category_repo.Repository, validator Validator) Service {
+	categoryRepo category_repo.Repository, validator validator.PostValidator) Service {
 	return &service{
 		repo:         repo,
 		userRepo:     userRepo,
