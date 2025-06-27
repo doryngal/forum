@@ -4,6 +4,7 @@ import (
 	"forum/internal/domain"
 	"forum/internal/service/category"
 	"forum/internal/service/post"
+	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"html/template"
 	"net/http"
@@ -14,14 +15,16 @@ type HomeHandler struct {
 	postService     post.Service
 	userService     user.Service
 	categoryService category.Service
+	sessionService  session.Service
 }
 
-func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service) *HomeHandler {
+func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service, ss session.Service) *HomeHandler {
 	return &HomeHandler{
 		tmpl:            tmpl,
 		postService:     ps,
 		userService:     us,
 		categoryService: cs,
+		sessionService:  ss,
 	}
 }
 
@@ -40,6 +43,16 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
+	var currentUser *domain.User
+
+	cookie, err := r.Cookie("session_id")
+	if err == nil && cookie.Value != "" {
+		sess, err := h.sessionService.GetByToken(cookie.Value)
+		if err == nil {
+			currentUser, _ = h.userService.GetUserByID(sess.UserID)
+		}
+	}
+
 	posts, err := h.postService.GetAllPosts()
 	if err != nil {
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
@@ -52,9 +65,11 @@ func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
+		User       *domain.User
 		Posts      []*domain.Post
 		Categories []*domain.Category
 	}{
+		User:       currentUser, // ← добавим в шаблон
 		Posts:      posts,
 		Categories: categories,
 	}
