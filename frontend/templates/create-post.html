@@ -1,119 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- FAVICON -->
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="../assets/favicon/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="../assets/favicon/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="../assets/favicon/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="../assets/favicon/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="../assets/favicon/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="../assets/favicon/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="../assets/favicon/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="../assets/favicon/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="../assets/favicon/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="../assets/favicon/android-icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="../assets/favicon/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="../assets/favicon/favicon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="../assets/favicon/favicon-16x16.png"
-    />
-    <link rel="manifest" href="../assets/favicon/manifest.json" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta
-      name="msapplication-TileImage"
-      content="../assets/favicon/ms-icon-144x144.png"
-    />
-    <meta name="theme-color" content="#ffffff" />
-    <!-- RESET CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-      integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <!-- REMIX ICONS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
-    <!-- GOOGLE FONTS -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;700;900&family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@1,700&display=swap"
-      rel="stylesheet"
-    />
+    {{template "head" .}}
     <!-- STYLE CSS -->
-    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/style.css" />
     <!-- APP CSS -->
-    <link rel="stylesheet" href="../styles/app.css" />
+    <link rel="stylesheet" href="/static/styles/app.css" />
     <!-- CREATE POST CSS -->
-    <link rel="stylesheet" href="../styles/create-post.css" />
+    <link rel="stylesheet" href="/static/styles/create-post.css" />
     <title>Okumi - New Post</title>
   </head>
   <body>
     <main class="main" id="main">
       <!-- LOADER -->
       <div class="full-loader" id="full-loader">
-        <img id="loader-img" src="../assets/images/preloder.gif" alt="" />
+        <img id="loader-img" src="/static/assets/images/preloder.gif" alt="" />
       </div>
       <!-- NAVBAR -->
       <header class="header-with-side" id="header">
@@ -126,49 +27,30 @@
             </div>
             <div class="searchbar-container" id="search-container">
               <input
-                type="search"
-                name="search"
-                class="search-input"
-                placeholder="Search..."
-                id="search-box"
-                tabindex="3"
-                autocomplete="off"
-                accesskey="s"
-              /><label class="search-icon" for="search" id="search">
+                      type="search"
+                      name="search"
+                      class="search-input"
+                      placeholder="Search..."
+                      id="search-box"
+                      tabindex="3"
+                      autocomplete="off"
+                      accesskey="s"
+              />
+              <label class="search-icon" for="search" id="search">
                 <i class="ri-search-line"></i>
               </label>
             </div>
           </div>
           <div class="btn-container">
-            <a
-              href="../templates/create-post.html"
-              class="navbar-icon navbar-active"
-              id="create-post-icon"
-              tabindex="4"
-              accesskey="c"
-            >
+            <a href="/create-post" class="navbar-icon navbar-active" id="create-post-icon" tabindex="4" accesskey="c">
               <i class="ri-add-box-line"></i>
             </a>
-            <a
-              class="navbar-icon"
-              id="notification-icon"
-              tabindex="5"
-              accesskey="n"
-            >
+            <a href="/notifications" class="navbar-icon" id="notification-icon" tabindex="5" accesskey="n">
               <i class="ri-notification-3-line"></i>
             </a>
-            <a
-              href="profile.html"
-              class="navbar-icon"
-              id="profile-icon"
-              tabindex="6"
-              accesskey="p"
-            >
+            <a href="/profile" class="navbar-icon" id="profile-icon" tabindex="6" accesskey="p">
               <div class="profile-img" id="profile-img">
-                <img
-                  src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                  alt="Profile"
-                />
+                <img src="https://source.boringavatars.com/beam/40/someone?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="Profile" />
               </div>
             </a>
           </div>
@@ -337,94 +219,89 @@
       <div class="main-back" id="main-back">
         <div class="main-wrapper">
           <div class="btn-container">
-            <button
-              class="btn btn-primary btn-back"
-              id="btn-back"
-              accesskey="b"
-              title="Go Back"
-            >
+            <a href="/" class="btn btn-primary btn-back" id="btn-back" accesskey="b" title="Go Back">
               <i class="ri-arrow-go-back-line"></i>
-            </button>
+            </a>
           </div>
+
           <h2 class="title bw-100">New Post</h2>
-          <form action="#" class="form-vertical" method="POST">
+
+          {{if .Error}}
+          <div class="alert alert-error">
+            {{.Error}}
+          </div>
+          {{end}}
+
+          <form action="/create-post" class="form-vertical" method="POST">
             <div class="form-control">
               <div class="form-wrapper">
                 <input
-                  class="input-field"
-                  type="text"
-                  name="title"
-                  id="title"
-                  required
-                  maxlength="100"
-                  autocomplete="off"
-                  accesskey="1"
-                  autofocus
+                        class="input-field"
+                        type="text"
+                        name="title"
+                        id="title"
+                        required
+                        maxlength="100"
+                        autocomplete="off"
+                        accesskey="1"
+                        autofocus
+                        {{if .Form.title}}value="{{.Form.title}}"{{end}}
                 />
                 <div class="horizontal-rule">
                   <div class="horizontal-shadow"></div>
                 </div>
               </div>
-              <label class="control-label" for="title"
-                >Title: max 100 symbols</label
-              >
+              <label class="control-label" for="title">Title: max 100 symbols</label>
             </div>
+
             <div class="form-control">
               <div class="form-wrapper">
                 <input
-                  class="input-field"
-                  type="text"
-                  name="tags"
-                  id="tags"
-                  required
-                  maxlength="100"
-                  autocomplete="off"
-                  accesskey="2"
+                        class="input-field"
+                        type="text"
+                        name="tags"
+                        id="tags"
+                        required
+                        maxlength="100"
+                        autocomplete="off"
+                        accesskey="2"
+                        {{if .Form.tags}}value="{{.Form.tags}}"{{end}}
                 />
                 <div class="horizontal-rule">
                   <div class="horizontal-shadow"></div>
                 </div>
               </div>
-              <label class="control-label" for="tags"
-                >Tags: max 5 tags, divided by `space`</label
-              >
+              <label class="control-label" for="tags">Tags: max 5 tags, divided by `space`</label>
             </div>
+
             <div class="form-control">
               <div class="form-wrapper">
-                <textarea
-                  class="input-field"
-                  name="message"
-                  id="message"
-                  required
-                  maxlength="2400"
-                  accesskey="3"
-                  cols="30"
-                  rows="10"
-                ></textarea>
+                            <textarea
+                                    class="input-field"
+                                    name="message"
+                                    id="message"
+                                    required
+                                    maxlength="2400"
+                                    accesskey="3"
+                                    cols="30"
+                                    rows="10"
+                            >{{if .Form.content}}{{.Form.content}}{{end}}</textarea>
                 <div class="horizontal-rule">
                   <div class="horizontal-shadow"></div>
                 </div>
               </div>
-              <label class="control-label" for="message"
-                >Message: max 2400 symbols</label
-              >
+              <label class="control-label" for="message">Message: max 2400 symbols</label>
             </div>
-            <button class="btn bw-100 btn-primary">Create Post</button>
-            <span class="bottom-text"
-              >Additionally you can attach the photo:</span
-            >
-            <a
-              href="register.html"
-              class="after-bottom-text"
-              id="upload-image"
-              >Click here +</a
-            >
+
+            <button type="submit" class="btn bw-100 btn-primary">Create Post</button>
+            <span class="bottom-text">Additionally you can attach the photo:</span>
+            <button type="button" class="after-bottom-text" id="upload-image">Click here +</button>
           </form>
         </div>
       </div>
     </main>
-    <script src="../scripts/main.js"></script>
-    <script src="../scripts/app.js"></script>
-    <script src="../scripts/create-post.js"></script>
+    <script src="../static/scripts/main.js"></script>
+    <script src="../static/scripts/app.js"></script>
+    <script src="../static/scripts/create-post.js"></script>
   </body>
 </html>
