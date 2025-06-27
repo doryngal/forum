@@ -20,6 +20,9 @@
       <div class="main-back" id="main-back">
         <div class="main-wrapper">
           <section class="cards-list">
+            {{if .User}}
+            <h2 class="welcome-text">Welcome back, @{{.User.Username}}</h2>
+            {{end}}
             <div class="tags-list">
               <h5>
                 <a id="sortingBy"
