@@ -59,6 +59,8 @@ func (h *LoginHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.sessionService.DeleteByUserID(user.ID)
+
 	// Create session
 	session, err := h.sessionService.Create(user.ID)
 	if err != nil {
