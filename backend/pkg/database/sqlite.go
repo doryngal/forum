@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"forum/internal/config"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type SQLite struct {
