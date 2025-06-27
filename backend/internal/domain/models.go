@@ -16,7 +16,7 @@ type User struct {
 }
 
 type Session struct {
-	ID        uuid.UUID `json:"id"`
+	ID        string    `json:"id"`
 	UserID    uuid.UUID `json:"user_id"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
