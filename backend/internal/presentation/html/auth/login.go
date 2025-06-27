@@ -1,21 +1,24 @@
 package auth
 
 import (
-	"forum/internal/domain"
+	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"html/template"
+	"log"
 	"net/http"
 )
 
 type LoginHandler struct {
-	tmpl        *template.Template
-	userService user.Service
+	tmpl           *template.Template
+	userService    user.Service
+	sessionService session.Service
 }
 
-func NewLoginHandler(tmpl *template.Template, userService user.Service) *LoginHandler {
+func NewLoginHandler(tmpl *template.Template, userService user.Service, sessionService session.Service) *LoginHandler {
 	return &LoginHandler{
-		tmpl:        tmpl,
-		userService: userService,
+		tmpl:           tmpl,
+		userService:    userService,
+		sessionService: sessionService,
 	}
 }
 
@@ -30,39 +33,65 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *LoginHandler) renderLogin(w http.ResponseWriter, data interface{}) {
-	err := h.tmpl.ExecuteTemplate(w, "login.html", data)
-	if err != nil {
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+func (h *LoginHandler) renderLogin(w http.ResponseWriter, data *TemplateData) {
+	if data == nil {
+		data = &TemplateData{}
+	}
+
+	if err := h.tmpl.ExecuteTemplate(w, "login.html", data); err != nil {
+		log.Printf("Template error: %v", err)
+		http.Error(w, "Failed to render login page", http.StatusInternalServerError)
 	}
 }
 
 func (h *LoginHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		h.renderLogin(w, TemplateData{Error: "Invalid form data"})
+		h.renderLogin(w, &TemplateData{Error: "Invalid form submission"})
 		return
 	}
 
-	credentials := domain.LoginCredentials{
-		Email:    r.FormValue("email"),
-		Password: r.FormValue("password"),
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	user, err := h.userService.Login(email, password)
+	if err != nil {
+		h.renderLogin(w, &TemplateData{Error: "Incorrect email or password"})
+		return
 	}
 
-	user, err := h.userService.Login(credentials.Email, credentials.Password)
+	// Create session
+	session, err := h.sessionService.Create(user.ID)
 	if err != nil {
-		h.renderLogin(w, TemplateData{Error: "Invalid email or password"})
+		http.Error(w, "Failed to create session: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    user.ID.String(),
+		Name:     "session_id",
+		Value:    session.ID,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // HTTPS
+		Secure:   false, // true for HTTPS
+		Expires:  session.ExpiresAt,
 	})
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *LoginHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_id")
+	if err == nil && cookie.Value != "" {
+		_ = h.sessionService.Delete(cookie.Value)
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:   "session_id",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	})
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 type TemplateData struct {
