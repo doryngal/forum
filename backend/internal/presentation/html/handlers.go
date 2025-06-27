@@ -22,7 +22,7 @@ type TemplateHandlers struct {
 
 func NewTemplateHandlers(tmpl *template.Template, services *service.Service) *TemplateHandlers {
 	return &TemplateHandlers{
-		Home:     home.NewHomeHandler(tmpl, services.Post, services.User, services.Category),
+		Home:     home.NewHomeHandler(tmpl, services.Post, services.User, services.Category, services.Session),
 		Login:    auth.NewLoginHandler(tmpl, services.User, services.Session),
 		Register: auth.NewRegisterHandler(tmpl, services.User),
 
