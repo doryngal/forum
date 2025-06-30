@@ -5,7 +5,6 @@ import (
 	"forum/internal/router"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
