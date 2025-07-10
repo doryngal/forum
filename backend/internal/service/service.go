@@ -12,6 +12,7 @@ import (
 	session_validator "forum/internal/service/session/validator"
 	user_service "forum/internal/service/user"
 	user_validator "forum/internal/service/user/validator"
+	"forum/pkg/logger"
 )
 
 type Service struct {
@@ -23,11 +24,12 @@ type Service struct {
 }
 
 func NewServices(reps *repository.Repositories) *Service {
+	logger := logger.New()
 	return &Service{
 		Category: category_service.New(reps.Category, reps.Post, category_validator.NewCategoryValidator()),
 		Comment:  comment_service.New(reps.Comment, reps.Post, reps.User, comment_validator.NewCommentValidator()),
 		Session:  session_service.New(reps.Session, session_validator.NewSessionValidator()),
 		Post:     post_service.New(reps.Post, reps.User, reps.Category, post_validator.NewPostValidator()),
-		User:     user_service.New(reps.User, user_validator.NewUserValidator()),
+		User:     user_service.New(reps.User, user_validator.NewUserValidator(), logger),
 	}
 }
