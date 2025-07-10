@@ -6,6 +6,8 @@ import (
 	"forum/internal/repository"
 	"forum/internal/service"
 	"forum/pkg/database"
+	"forum/pkg/logger"
+	"forum/pkg/middleware/logging"
 	"html/template"
 	"log"
 	"net/http"
@@ -41,7 +43,9 @@ func NewApp(cfg config.Config) (http.Handler, error) {
 	fs := http.FileServer(http.Dir("./../frontend/static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	return mux, nil
+	appLogger := logger.New()
+
+	return logging.LoggingMiddleware(appLogger, mux), nil
 }
 
 func registerHTMLRoutes(mux *http.ServeMux, h *html.TemplateHandlers) {
@@ -68,7 +72,6 @@ func parseTemplates() (*template.Template, error) {
 	tmpl := template.New("").Funcs(template.FuncMap{
 		"truncate": truncate,
 	})
-
 	err := filepath.Walk("./../frontend/templates", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
