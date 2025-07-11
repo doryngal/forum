@@ -72,14 +72,6 @@ func (s *service) LikeComment(commentID, userID uuid.UUID) error {
 		return user.ErrUserNotFound
 	}
 
-	reaction, err := s.repo.GetReaction(commentID, userID)
-	if err != nil && !errors.Is(err, comment_repo.ErrReactionNotFound) {
-		return err
-	}
-	if reaction == 1 {
-		return ErrAlreadyReacted
-	}
-
 	return s.repo.Like(commentID, userID)
 }
 
