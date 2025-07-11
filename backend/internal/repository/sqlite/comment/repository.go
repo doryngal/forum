@@ -81,10 +81,42 @@ func (r repository) Dislike(commentID, userID uuid.UUID) error {
 }
 
 func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error {
-	_, err := r.db.Exec(`
+	var existingReaction int
+	err := r.db.QueryRow(`
+		SELECT reaction FROM comment_reactions 
+		WHERE user_id = ? AND comment_id = ?`,
+		userID.String(), commentID.String(),
+	).Scan(&existingReaction)
+
+	if err != nil && err != sql.ErrNoRows {
+		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+	}
+
+	if err == nil {
+		if existingReaction == reaction {
+			_, err := r.db.Exec(`
+				DELETE FROM comment_reactions 
+				WHERE user_id = ? AND comment_id = ?`,
+				userID.String(), commentID.String())
+			if err != nil {
+				return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+			}
+			return nil
+		}
+		_, err := r.db.Exec(`
+			UPDATE comment_reactions 
+			SET reaction = ? 
+			WHERE user_id = ? AND comment_id = ?`,
+			reaction, userID.String(), commentID.String())
+		if err != nil {
+			return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+		}
+		return nil
+	}
+
+	_, err = r.db.Exec(`
 		INSERT INTO comment_reactions (user_id, comment_id, reaction) 
-		VALUES (?, ?, ?)
-		ON CONFLICT(user_id, comment_id) DO UPDATE SET reaction = excluded.reaction`,
+		VALUES (?, ?, ?)`,
 		userID.String(), commentID.String(), reaction)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
