@@ -70,14 +70,27 @@
                     </p>
                   </div>
                   <div class="btn-container">
-                    <button class="btn btn-white btn-like" data-post-id="{{.ID}}">
-                      <i class="ri-thumb-up-line"></i>
-                      <span class="like-count">{{.Likes}}</span>
-                    </button>
-                    <button class="btn btn-white btn-dislike" data-post-id="{{.ID}}">
-                      <i class="ri-thumb-down-line"></i>
-                      <span class="dislike-count">{{.Dislikes}}</span>
-                    </button>
+
+                    <!-- Like Form -->
+                    <form method="POST" action="/" class="like-form" data-post-id="{{.ID}}">
+                      <input type="hidden" name="action" value="like">
+                      <input type="hidden" name="post_id" value="{{.ID}}">
+                      <button type="submit" class="btn btn-white btn-like" data-post-id="{{.ID}}">
+                        <i class="ri-thumb-up-line"></i>
+                        <span class="like-count">{{.Likes}}</span>
+                      </button>
+                    </form>
+
+                    <!-- Dislike Form -->
+                    <form method="POST" action="/" class="dislike-form" data-post-id="{{.ID}}">
+                      <input type="hidden" name="action" value="dislike">
+                      <input type="hidden" name="post_id" value="{{.ID}}">
+                      <button type="submit" class="btn btn-white btn-dislike" data-post-id="{{.ID}}">
+                        <i class="ri-thumb-down-line"></i>
+                        <span class="dislike-count">{{.Dislikes}}</span>
+                      </button>
+                    </form>
+
                   </div>
                 </div>
                 <div class="horizontal-rule"></div>
