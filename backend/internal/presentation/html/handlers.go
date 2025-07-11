@@ -22,13 +22,12 @@ type TemplateHandlers struct {
 
 func NewTemplateHandlers(tmpl *template.Template, services *service.Service) *TemplateHandlers {
 	return &TemplateHandlers{
-		Home:     home.NewHomeHandler(tmpl, services.Post, services.User, services.Category, services.Session),
-		Login:    auth.NewLoginHandler(tmpl, services.User, services.Session),
-		Register: auth.NewRegisterHandler(tmpl, services.User),
+		Home:       home.NewHomeHandler(tmpl, services.Post, services.User, services.Category, services.Session),
+		Login:      auth.NewLoginHandler(tmpl, services.User, services.Session),
+		Register:   auth.NewRegisterHandler(tmpl, services.User),
+		Post:       post.NewPostHandler(tmpl, services.User, services.Post, services.Comment, services.Session),
+		CreatePost: post.NewCreateHandler(tmpl, services.User, services.Post, services.Session),
 
-		Post:       post.NewPostHandler(tmpl, services.User, services.Post, services.Comment),
-		CreatePost: post.NewCreateHandler(tmpl, services.User, services.Post),
-
-		Profile: profile.NewProfileHandler(tmpl, services.User, services.Post),
+		Profile: profile.NewProfileHandler(tmpl, services.User, services.Post, services.Session),
 	}
 }
