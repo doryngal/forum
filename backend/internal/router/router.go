@@ -58,6 +58,7 @@ func registerHTMLRoutes(mux *http.ServeMux, h *html.TemplateHandlers) {
 	mux.HandleFunc("/create-post", h.CreatePost.ServeHTTP)
 	mux.HandleFunc("/post/", h.Post.ServeHTTP)
 
+	mux.HandleFunc("/profile", h.Profile.ServeHTTP)
 	mux.HandleFunc("/profile/", h.Profile.ServeHTTP)
 }
 
