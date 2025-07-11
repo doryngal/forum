@@ -50,7 +50,7 @@ func (h *LoginHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := r.FormValue("email")
+	email := r.FormValue("emailOrUsername")
 	password := r.FormValue("password")
 
 	user, err := h.userService.Login(email, password)
