@@ -132,12 +132,9 @@ func (s *service) LikePost(postID, userID uuid.UUID) error {
 		return user.ErrUserNotFound
 	}
 
-	reaction, err := s.repo.GetReaction(postID, userID)
+	_, err := s.repo.GetReaction(postID, userID)
 	if err != nil && !errors.Is(err, post_repo.ErrReactionNotFound) {
 		return err
-	}
-	if reaction == 1 {
-		return ErrAlreadyReacted
 	}
 
 	return s.repo.Like(postID, userID)
