@@ -30,6 +30,32 @@ func (r repository) Create(user *domain.User) error {
 	return nil
 }
 
+func (r repository) FindByEmailORUsername(emailOrUsername string) (*domain.User, error) {
+	var u domain.User
+	var idStr string
+
+	err := r.db.QueryRow(
+		`SELECT id, email, username, password_hash, created_at 
+		 FROM users 
+		 WHERE email = ? OR username = ?`,
+		emailOrUsername, emailOrUsername,
+	).Scan(&idStr, &u.Email, &u.Username, &u.PasswordHash, &u.CreatedAt)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+	}
+
+	u.ID, err = uuid.Parse(idStr)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+	}
+
+	return &u, nil
+}
+
 func (r repository) FindByEmail(email string) (*domain.User, error) {
 	var u domain.User
 	var idStr string
