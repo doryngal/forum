@@ -302,12 +302,51 @@ func (r repository) Dislike(postID, userID uuid.UUID) error {
 }
 
 func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
-	_, err := r.db.Exec(`
+	var existingReaction int
+	err := r.db.QueryRow(`
+		SELECT reaction FROM post_reactions 
+		WHERE user_id = ? AND post_id = ?`,
+		userID.String(), postID.String(),
+	).Scan(&existingReaction)
+
+	if err != nil && err != sql.ErrNoRows {
+		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+	}
+
+	if err == nil {
+		// реакция уже есть
+		if existingReaction == reaction {
+			// если такая же — удалить
+			_, err := r.db.Exec(`
+				DELETE FROM post_reactions 
+				WHERE user_id = ? AND post_id = ?`,
+				userID.String(), postID.String())
+			if err != nil {
+				return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+			}
+			return nil
+		}
+		// если другая — обновить
+		_, err := r.db.Exec(`
+			UPDATE post_reactions 
+			SET reaction = ? 
+			WHERE user_id = ? AND post_id = ?`,
+			reaction, userID.String(), postID.String())
+		if err != nil {
+			return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+		}
+		return nil
+	}
+
+	// реакции нет — вставляем новую
+	_, err = r.db.Exec(`
 		INSERT INTO post_reactions (user_id, post_id, reaction) 
-		VALUES (?, ?, ?)
-		ON CONFLICT(user_id, post_id) DO UPDATE SET reaction = excluded.reaction`,
+		VALUES (?, ?, ?)`,
 		userID.String(), postID.String(), reaction)
-	return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+	}
+	return nil
 }
 
 func (r repository) ExistsByID(postID uuid.UUID) (bool, error) {
