@@ -6,7 +6,9 @@ import (
 	"forum/internal/service/post"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
+	"github.com/google/uuid"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -34,12 +36,14 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != http.MethodGet {
+	switch r.Method {
+	case http.MethodGet:
+		h.handleHome(w, r)
+	case http.MethodPost:
+		h.handleAction(w, r)
+	default:
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
 	}
-
-	h.handleHome(w, r)
 }
 
 func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
@@ -69,12 +73,65 @@ func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
 		Posts      []*domain.Post
 		Categories []*domain.Category
 	}{
-		User:       currentUser, // ← добавим в шаблон
+		User:       currentUser,
 		Posts:      posts,
 		Categories: categories,
 	}
 
 	if err := h.tmpl.ExecuteTemplate(w, "home.html", data); err != nil {
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		log.Printf("template error: %v", err)
+		http.Error(w, "Template rendering failed", http.StatusInternalServerError)
 	}
+}
+
+func (h *HomeHandler) handleAction(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	userID, err := h.getUserIDFromSession(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	action := r.FormValue("action")
+	postIDStr := r.FormValue("post_id")
+	postID, err := uuid.Parse(postIDStr)
+	if err != nil {
+		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		return
+	}
+
+	switch action {
+	case "like":
+		err = h.postService.LikePost(postID, userID)
+	case "dislike":
+		err = h.postService.DislikePost(postID, userID)
+	default:
+		http.Error(w, "Unknown action", http.StatusBadRequest)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, "Action failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HomeHandler) getUserIDFromSession(r *http.Request) (uuid.UUID, error) {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	sess, err := h.sessionService.GetByToken(cookie.Value)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return sess.UserID, nil
 }
