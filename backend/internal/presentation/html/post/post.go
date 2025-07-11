@@ -5,6 +5,7 @@ import (
 	"forum/internal/domain"
 	"forum/internal/service/comment"
 	"forum/internal/service/post"
+	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"html/template"
 	"log"
@@ -19,19 +20,20 @@ type PostHandler struct {
 	userService    user.Service
 	postService    post.Service
 	commentService comment.Service
+	sessionService session.Service
 }
 
-func NewPostHandler(tmpl *template.Template, userService user.Service, postService post.Service, commentService comment.Service) *PostHandler {
+func NewPostHandler(tmpl *template.Template, userService user.Service, postService post.Service, commentService comment.Service, sessionService session.Service) *PostHandler {
 	return &PostHandler{
 		tmpl:           tmpl,
 		userService:    userService,
 		postService:    postService,
 		commentService: commentService,
+		sessionService: sessionService,
 	}
 }
 
 func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Ожидается маршрут вида /post/{uuid}
 	postIDStr := strings.TrimPrefix(r.URL.Path, "/post/")
 	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
@@ -54,6 +56,7 @@ type PostData struct {
 	Comments []*domain.Comment
 	Error    string
 	Success  string
+	User     *domain.User
 }
 
 func (h *PostHandler) handleGetPost(w http.ResponseWriter, r *http.Request, postID uuid.UUID) {
@@ -72,6 +75,15 @@ func (h *PostHandler) handleGetPost(w http.ResponseWriter, r *http.Request, post
 	data := PostData{
 		Post:     post,
 		Comments: comments,
+	}
+
+	// Добавляем информацию о пользователе из сессии
+	cookie, err := r.Cookie("session_id")
+	if err == nil && cookie.Value != "" {
+		sess, err := h.sessionService.GetByToken(cookie.Value)
+		if err == nil {
+			data.User, _ = h.userService.GetUserByID(sess.UserID)
+		}
 	}
 
 	if err := h.tmpl.ExecuteTemplate(w, "post.html", data); err != nil {
@@ -99,6 +111,23 @@ func (h *PostHandler) handlePostAction(w http.ResponseWriter, r *http.Request, p
 		err = h.postService.DislikePost(postID, userID)
 	case "comment":
 		err = h.handleCreateComment(r, postID, userID)
+	case "like_comment":
+		commentIDStr := r.FormValue("comment_id")
+		commentID, err := uuid.Parse(commentIDStr)
+		if err != nil {
+			http.Error(w, "Invalid comment ID", http.StatusBadRequest)
+			return
+		}
+		err = h.commentService.LikeComment(commentID, userID)
+
+	case "dislike_comment":
+		commentIDStr := r.FormValue("comment_id")
+		commentID, err := uuid.Parse(commentIDStr)
+		if err != nil {
+			http.Error(w, "Invalid comment ID", http.StatusBadRequest)
+			return
+		}
+		err = h.commentService.DislikeComment(commentID, userID)
 	default:
 		http.Error(w, "Unknown action", http.StatusBadRequest)
 		return
@@ -126,13 +155,15 @@ func (h *PostHandler) handleCreateComment(r *http.Request, postID, userID uuid.U
 }
 
 func (h *PostHandler) getUserIDFromSession(r *http.Request) (uuid.UUID, error) {
-	cookie, err := r.Cookie("user_id")
+	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		return uuid.Nil, err
 	}
-	id, err := uuid.Parse(cookie.Value)
+
+	sess, err := h.sessionService.GetByToken(cookie.Value)
 	if err != nil {
 		return uuid.Nil, err
 	}
-	return id, nil
+
+	return sess.UserID, nil
 }
