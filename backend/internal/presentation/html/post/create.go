@@ -4,32 +4,33 @@ import (
 	"errors"
 	"forum/internal/domain"
 	"forum/internal/service/post"
+	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"html/template"
 	"net/http"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
 type CreateHandler struct {
-	tmpl        *template.Template
-	userService user.Service
-	postService post.Service
+	tmpl           *template.Template
+	userService    user.Service
+	postService    post.Service
+	sessionService session.Service
 }
 
-func NewCreateHandler(tmpl *template.Template, userService user.Service, postService post.Service) *CreateHandler {
+func NewCreateHandler(tmpl *template.Template, userService user.Service, postService post.Service, sessionService session.Service) *CreateHandler {
 	return &CreateHandler{
-		tmpl:        tmpl,
-		userService: userService,
-		postService: postService,
+		tmpl:           tmpl,
+		userService:    userService,
+		postService:    postService,
+		sessionService: sessionService,
 	}
 }
 
 func (h *CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		h.renderCreateForm(w, nil)
+		h.renderCreateForm(w, r, nil)
 	case http.MethodPost:
 		h.handleCreatePost(w, r)
 	default:
@@ -40,12 +41,23 @@ func (h *CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type CreatePostData struct {
 	Error string
 	Form  map[string]string
+	User  *domain.User
 }
 
-func (h *CreateHandler) renderCreateForm(w http.ResponseWriter, data *CreatePostData) {
+func (h *CreateHandler) renderCreateForm(w http.ResponseWriter, r *http.Request, data *CreatePostData) {
 	if data == nil {
 		data = &CreatePostData{}
 	}
+
+	// Добавляем информацию о пользователе из сессии
+	cookie, err := r.Cookie("session_id")
+	if err == nil && cookie.Value != "" {
+		sess, err := h.sessionService.GetByToken(cookie.Value)
+		if err == nil {
+			data.User, _ = h.userService.GetUserByID(sess.UserID)
+		}
+	}
+
 	if err := h.tmpl.ExecuteTemplate(w, "create-post.html", data); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 	}
@@ -53,7 +65,7 @@ func (h *CreateHandler) renderCreateForm(w http.ResponseWriter, data *CreatePost
 
 func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		h.renderCreateForm(w, &CreatePostData{
+		h.renderCreateForm(w, r, &CreatePostData{
 			Error: "Invalid form data",
 		})
 		return
@@ -66,7 +78,7 @@ func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(formData["title"]) == 0 {
-		h.renderCreateForm(w, &CreatePostData{
+		h.renderCreateForm(w, r, &CreatePostData{
 			Error: "Title is required",
 			Form:  formData,
 		})
@@ -87,7 +99,7 @@ func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := h.postService.CreatePost(post); err != nil {
-		h.renderCreateForm(w, &CreatePostData{
+		h.renderCreateForm(w, r, &CreatePostData{
 			Error: "Failed to create post: " + err.Error(),
 			Form:  formData,
 		})
@@ -98,17 +110,17 @@ func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *CreateHandler) getUserFromSession(r *http.Request) (*domain.User, error) {
-	cookie, err := r.Cookie("user_id")
+	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		return nil, err
 	}
 
-	userID, err := uuid.Parse(cookie.Value)
+	sess, err := h.sessionService.GetByToken(cookie.Value)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := h.userService.GetUserByID(userID)
+	user, err := h.userService.GetUserByID(sess.UserID)
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
