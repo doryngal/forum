@@ -58,18 +58,13 @@ func (s *service) RegisterUser(user *domain.User) error {
 	return nil
 }
 
-func (s *service) Login(email, password string) (*domain.User, error) {
-	s.log.Info("Login attempt", logger.F("email", email))
+func (s *service) Login(emailOrUsername, password string) (*domain.User, error) {
+	s.log.Info("Login attempt", logger.F("email", emailOrUsername))
 
-	if err := s.validator.ValidateEmail(email); err != nil {
-		s.log.Error("Invalid email format", logger.F("email", email))
-		return nil, ErrInvalidCredentials
-	}
-
-	user, err := s.repo.FindByEmail(email)
+	user, err := s.repo.FindByEmailORUsername(emailOrUsername)
 	if err != nil {
 		if errors.Is(err, user_repo.ErrQueryFailed) {
-			s.log.Info("User not found", logger.F("email", email))
+			s.log.Info("User not found", logger.F("email/username", emailOrUsername))
 			return nil, ErrInvalidCredentials
 		}
 		s.log.Error("Find user by email failed", logger.F("error", err))
@@ -77,11 +72,11 @@ func (s *service) Login(email, password string) (*domain.User, error) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-		s.log.Info("Invalid password", logger.F("email", email))
+		s.log.Info("Invalid password", logger.F("email/username", emailOrUsername))
 		return nil, ErrInvalidCredentials
 	}
 
-	s.log.Info("Login successful", logger.F("email", email))
+	s.log.Info("Login successful", logger.F("email/username", emailOrUsername))
 	return user, nil
 }
 
