@@ -3,9 +3,9 @@ package post
 import (
 	"errors"
 	"forum/internal/domain"
-	category_repo "forum/internal/repository/sqlite/category"
-	post_repo "forum/internal/repository/sqlite/post"
-	user_repo "forum/internal/repository/sqlite/user"
+	category_repo "forum/internal/repository/category"
+	post2 "forum/internal/repository/post"
+	user_repo "forum/internal/repository/user"
 	"forum/internal/service/category"
 	"forum/internal/service/post/validator"
 	"forum/internal/service/user"
@@ -14,13 +14,13 @@ import (
 )
 
 type service struct {
-	repo         post_repo.Repository
+	repo         post2.Repository
 	userRepo     user_repo.Repository
 	categoryRepo category_repo.Repository
 	validator    validator.PostValidator
 }
 
-func New(repo post_repo.Repository, userRepo user_repo.Repository,
+func New(repo post2.Repository, userRepo user_repo.Repository,
 	categoryRepo category_repo.Repository, validator validator.PostValidator) Service {
 	return &service{
 		repo:         repo,
@@ -56,7 +56,7 @@ func (s *service) GetPostByID(id uuid.UUID) (*domain.Post, error) {
 
 	post, err := s.repo.GetByID(id)
 	if err != nil {
-		if errors.Is(err, post_repo.ErrScanFailed) {
+		if errors.Is(err, post2.ErrScanFailed) {
 			return nil, ErrPostNotFound
 		}
 		return nil, err
@@ -133,7 +133,7 @@ func (s *service) LikePost(postID, userID uuid.UUID) error {
 	}
 
 	_, err := s.repo.GetReaction(postID, userID)
-	if err != nil && !errors.Is(err, post_repo.ErrReactionNotFound) {
+	if err != nil && !errors.Is(err, post2.ErrReactionNotFound) {
 		return err
 	}
 
@@ -153,7 +153,7 @@ func (s *service) DislikePost(postID, userID uuid.UUID) error {
 	}
 
 	reaction, err := s.repo.GetReaction(postID, userID)
-	if err != nil && !errors.Is(err, post_repo.ErrReactionNotFound) {
+	if err != nil && !errors.Is(err, post2.ErrReactionNotFound) {
 		return err
 	}
 	if reaction == -1 {
