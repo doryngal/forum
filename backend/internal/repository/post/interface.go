@@ -16,4 +16,7 @@ type Repository interface {
 	Dislike(postID, userID uuid.UUID) error
 	ExistsByID(postID uuid.UUID) (bool, error)
 	GetReaction(postID, userID uuid.UUID) (int, error)
+
+	Update(post *domain.Post) error
+	Delete(postID uuid.UUID, userID uuid.UUID) error
 }
