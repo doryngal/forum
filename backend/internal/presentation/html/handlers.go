@@ -10,7 +10,7 @@ import (
 )
 
 type TemplateHandlers struct {
-	Home     *home.HomeHandler
+	Home     *home.Handler
 	Login    *auth.LoginHandler
 	Register *auth.RegisterHandler
 
@@ -26,7 +26,7 @@ func NewTemplateHandlers(tmpl *template.Template, services *service.Service) *Te
 		Login:      auth.NewLoginHandler(tmpl, services.User, services.Session),
 		Register:   auth.NewRegisterHandler(tmpl, services.User),
 		Post:       post.NewPostHandler(tmpl, services.User, services.Post, services.Comment, services.Session),
-		CreatePost: post.NewCreateHandler(tmpl, services.User, services.Post, services.Session),
+		CreatePost: post.NewCreateHandler(tmpl, services.User, services.Post, services.Session, services.Category),
 
 		Profile: profile.NewProfileHandler(tmpl, services.User, services.Post, services.Session),
 	}
