@@ -3,8 +3,8 @@ package category
 import (
 	"errors"
 	"forum/internal/domain"
-	category_repo "forum/internal/repository/sqlite/category"
-	post_repo "forum/internal/repository/sqlite/post"
+	category_repo "forum/internal/repository/category"
+	post_repo "forum/internal/repository/post"
 	"forum/internal/service/category/validator"
 	"github.com/google/uuid"
 )
