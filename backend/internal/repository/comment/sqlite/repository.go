@@ -1,9 +1,10 @@
-package comment
+package sqlite
 
 import (
 	"database/sql"
 	"fmt"
 	"forum/internal/domain"
+	comment2 "forum/internal/repository/comment"
 	"github.com/google/uuid"
 	"time"
 )
@@ -12,7 +13,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) Repository {
+func New(db *sql.DB) comment2.Repository {
 	return &repository{db: db}
 }
 
@@ -25,7 +26,7 @@ func (r repository) Create(comment *domain.Comment) error {
 		comment.ID.String(), comment.PostID.String(), comment.UserID.String(), comment.Content, comment.CreatedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrInsertCommentFailed, err)
+		return fmt.Errorf("%w: %v", comment.ErrInsertCommentFailed, err)
 	}
 	return nil
 }
@@ -43,7 +44,7 @@ func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
 		GROUP BY c.id
 		ORDER BY c.created_at DESC`, postID.String())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", comment2.ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -53,19 +54,19 @@ func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
 		var idStr, postIDStr, userIDStr string
 		if err := rows.Scan(&idStr, &postIDStr, &userIDStr, &c.Content,
 			&c.CreatedAt, &c.AuthorUsername, &c.Likes, &c.Dislikes); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
+			return nil, fmt.Errorf("%w: %v", comment2.ErrScanFailed, err)
 		}
 		c.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", comment2.ErrUUIDParseFailed, err)
 		}
 		c.PostID, err = uuid.Parse(postIDStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", comment2.ErrUUIDParseFailed, err)
 		}
 		c.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", comment2.ErrUUIDParseFailed, err)
 		}
 		comments = append(comments, &c)
 	}
@@ -89,7 +90,7 @@ func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error
 	).Scan(&existingReaction)
 
 	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+		return fmt.Errorf("%w: %v", comment2.ErrReactionUpdateFailed, err)
 	}
 
 	if err == nil {
@@ -99,7 +100,7 @@ func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error
 				WHERE user_id = ? AND comment_id = ?`,
 				userID.String(), commentID.String())
 			if err != nil {
-				return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+				return fmt.Errorf("%w: %v", comment2.ErrReactionUpdateFailed, err)
 			}
 			return nil
 		}
@@ -109,7 +110,7 @@ func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error
 			WHERE user_id = ? AND comment_id = ?`,
 			reaction, userID.String(), commentID.String())
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+			return fmt.Errorf("%w: %v", comment2.ErrReactionUpdateFailed, err)
 		}
 		return nil
 	}
@@ -119,7 +120,7 @@ func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error
 		VALUES (?, ?, ?)`,
 		userID.String(), commentID.String(), reaction)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+		return fmt.Errorf("%w: %v", comment2.ErrReactionUpdateFailed, err)
 	}
 	return nil
 }
@@ -140,9 +141,9 @@ func (r *repository) GetReaction(commentID, userID uuid.UUID) (int, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, ErrReactionNotFound
+			return 0, comment2.ErrReactionNotFound
 		}
-		return 0, fmt.Errorf("%w: %v", ErrGetReactionFailed, err)
+		return 0, fmt.Errorf("%w: %v", comment2.ErrGetReactionFailed, err)
 	}
 
 	return reaction, nil
