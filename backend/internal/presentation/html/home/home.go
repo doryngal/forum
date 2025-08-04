@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-type HomeHandler struct {
+type Handler struct {
 	tmpl            *template.Template
 	postService     post.Service
 	userService     user.Service
@@ -20,8 +20,8 @@ type HomeHandler struct {
 	sessionService  session.Service
 }
 
-func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service, ss session.Service) *HomeHandler {
-	return &HomeHandler{
+func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service, ss session.Service) *Handler {
+	return &Handler{
 		tmpl:            tmpl,
 		postService:     ps,
 		userService:     us,
@@ -30,7 +30,7 @@ func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, c
 	}
 }
 
-func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -46,7 +46,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleHome(w http.ResponseWriter, r *http.Request) {
 	var currentUser *domain.User
 
 	cookie, err := r.Cookie("session_id")
@@ -84,7 +84,7 @@ func (h *HomeHandler) handleHome(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HomeHandler) handleAction(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleAction(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
@@ -122,7 +122,7 @@ func (h *HomeHandler) handleAction(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (h *HomeHandler) getUserIDFromSession(r *http.Request) (uuid.UUID, error) {
+func (h *Handler) getUserIDFromSession(r *http.Request) (uuid.UUID, error) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		return uuid.Nil, err
