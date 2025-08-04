@@ -19,12 +19,12 @@
             </h1>
           </div>
           <div class="anchors-container">
-            <a href="https://01.alem.school/" class="nav-link">Alem School</a
+            <a href="https://01.tomorrow-school.ai/" class="nav-link">Tomorrow School</a
             ><a
               href="https://github.com/01-edu/public/tree/master/subjects/forum"
               class="nav-link"
               >Requirements</a
-            ><a href="https://github.com/SE-Designs/forum-v2" class="nav-link"
+            ><a href="https://github.com/doryngal/forum" class="nav-link"
               >Source Code</a
             >
           </div>
@@ -43,12 +43,6 @@
       <div class="main-gradient-back" id="main-gradient-back">
         <div class="main-wrapper">
           <h2 class="title bw-100">Login Now</h2>
-
-          {{if .Error}}
-          <div class="alert alert-error">
-            {{.Error}}
-          </div>
-          {{end}}
 
           <form action="#" class="form-vertical" method="POST">
             <div class="form-control">
@@ -91,21 +85,14 @@
               <label class="control-label" for="password">Password:</label>
             </div>
             <button type="submit" class="btn bw-100 btn-white">Login</button>
+            {{if .Error}}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+              {{.Error}}
+            </div>
+            {{end}}
             <span class="bottom-text">Don't have an account?</span>
             <a href="/register" class="after-bottom-text" id="register-btn">Register</a>
           </form>
-          <span class="bottom-text">or login with:</span>
-          <div class="btn-container">
-            <button class="btn btn-black" title="Login with Google">
-              <i class="ri-google-line"></i>
-            </button>
-            <button class="btn btn-black" title="Login with Facebook">
-              <i class="ri-facebook-circle-line"></i>
-            </button>
-            <button class="btn btn-black" title="Login with Github">
-              <i class="ri-github-line"></i>
-            </button>
-          </div>
         </div>
       </div>
     </main>
