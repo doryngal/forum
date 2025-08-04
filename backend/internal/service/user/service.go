@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"forum/internal/domain"
-	user_repo "forum/internal/repository/sqlite/user"
+	user2 "forum/internal/repository/user"
 	"forum/internal/service/user/validator"
 	"forum/pkg/logger"
 	"github.com/google/uuid"
@@ -11,12 +11,12 @@ import (
 )
 
 type service struct {
-	repo      user_repo.Repository
+	repo      user2.Repository
 	validator validator.UserValidator
 	log       logger.Logger
 }
 
-func New(repo user_repo.Repository, validator validator.UserValidator, log logger.Logger) Service {
+func New(repo user2.Repository, validator validator.UserValidator, log logger.Logger) Service {
 	return &service{
 		repo:      repo,
 		validator: validator,
@@ -63,7 +63,7 @@ func (s *service) Login(emailOrUsername, password string) (*domain.User, error) 
 
 	user, err := s.repo.FindByEmailORUsername(emailOrUsername)
 	if err != nil {
-		if errors.Is(err, user_repo.ErrQueryFailed) {
+		if errors.Is(err, user2.ErrQueryFailed) {
 			s.log.Info("User not found", logger.F("email/username", emailOrUsername))
 			return nil, ErrInvalidCredentials
 		}
@@ -85,7 +85,7 @@ func (s *service) GetUserByEmail(email string) (*domain.User, error) {
 
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
-		if errors.Is(err, user_repo.ErrQueryFailed) {
+		if errors.Is(err, user2.ErrQueryFailed) {
 			s.log.Info("User not found by email", logger.F("email", email))
 			return nil, ErrUserNotFound
 		}
@@ -105,7 +105,7 @@ func (s *service) GetUserByID(id uuid.UUID) (*domain.User, error) {
 
 	user, err := s.repo.FindByID(id)
 	if err != nil {
-		if errors.Is(err, user_repo.ErrQueryFailed) {
+		if errors.Is(err, user2.ErrQueryFailed) {
 			s.log.Info("User not found by ID", logger.F("user_id", id))
 			return nil, ErrUserNotFound
 		}
@@ -135,7 +135,7 @@ func (s *service) GetUserByUsername(username string) (*domain.User, error) {
 
 	user, err := s.repo.FindByUsername(username)
 	if err != nil {
-		if errors.Is(err, user_repo.ErrQueryFailed) {
+		if errors.Is(err, user2.ErrQueryFailed) {
 			s.log.Info("User not found by username", logger.F("username", username))
 			return nil, ErrUserNotFound
 		}
@@ -155,7 +155,7 @@ func (s *service) GetUserStats(userID uuid.UUID) (*domain.UserStats, error) {
 
 	stats, err := s.repo.GetStats(userID)
 	if err != nil {
-		if errors.Is(err, user_repo.ErrQueryFailed) {
+		if errors.Is(err, user2.ErrQueryFailed) {
 			s.log.Info("User stats not found", logger.F("user_id", userID))
 			return nil, ErrUserNotFound
 		}
