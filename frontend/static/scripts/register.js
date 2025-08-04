@@ -13,7 +13,7 @@ const horizontalRule = document.querySelectorAll(".horizontal-rule");
 
 usernameInput.addEventListener("change", (e) => {
   let username = e.target.value;
-  let profilePicture = `<img src="https://source.boringavatars.com/beam/40/${username}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A">
+  let profilePicture = `<img src="./static/assets/images/user.png" alt="{{.AuthorUsername}}>
   <h5>Your unique avatar</h5>`;
   const profilePictureContainer = document.querySelector(
     ".profile-picture-container"
