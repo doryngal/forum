@@ -98,6 +98,7 @@
                     </a>
                     <div class="sidebar-active-item"></div>
                 </li>
+                {{ if .User }}
                 <li class="sidebar-item">
                     <a href="/logout" class="sidebar-icon" accesskey="l">
                         <i class="ri-logout-box-line"></i>
@@ -105,6 +106,7 @@
                     </a>
                     <div class="sidebar-active-item"></div>
                 </li>
+                {{ end }}
             </ul>
         </div>
     </div>
