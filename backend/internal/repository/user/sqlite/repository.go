@@ -1,9 +1,10 @@
-package user
+package sqlite
 
 import (
 	"database/sql"
 	"fmt"
 	"forum/internal/domain"
+	user_repo "forum/internal/repository/user"
 	"github.com/google/uuid"
 	"time"
 )
@@ -12,7 +13,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) Repository {
+func New(db *sql.DB) user_repo.Repository {
 	return &repository{db: db}
 }
 
@@ -25,7 +26,7 @@ func (r repository) Create(user *domain.User) error {
 		user.ID.String(), user.Email, user.Username, user.PasswordHash, user.CreatedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrInsertUserFailed, err)
+		return fmt.Errorf("%w: %v", user_repo.ErrInsertUserFailed, err)
 	}
 	return nil
 }
@@ -45,12 +46,12 @@ func (r repository) FindByEmailORUsername(emailOrUsername string) (*domain.User,
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrQueryFailed, err)
 	}
 
 	u.ID, err = uuid.Parse(idStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrUUIDParseFailed, err)
 	}
 
 	return &u, nil
@@ -69,12 +70,12 @@ func (r repository) FindByEmail(email string) (*domain.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrQueryFailed, err)
 	}
 
 	u.ID, err = uuid.Parse(idStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrUUIDParseFailed, err)
 	}
 
 	return &u, nil
@@ -93,12 +94,12 @@ func (r repository) FindByID(id uuid.UUID) (*domain.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrQueryFailed, err)
 	}
 
 	u.ID, err = uuid.Parse(idStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrUUIDParseFailed, err)
 	}
 
 	return &u, nil
@@ -113,7 +114,7 @@ func (r repository) IsEmailTaken(email string) (bool, error) {
 	).Scan(&exists)
 
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", ErrCheckExistsFailed, err)
+		return false, fmt.Errorf("%w: %v", user_repo.ErrCheckExistsFailed, err)
 	}
 
 	return exists, nil
@@ -126,7 +127,7 @@ func (r *repository) ExistsByID(id uuid.UUID) (bool, error) {
 		id.String(),
 	).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return false, fmt.Errorf("%w: %v", user_repo.ErrQueryFailed, err)
 	}
 	return exists, nil
 }
@@ -144,12 +145,12 @@ func (r *repository) FindByUsername(username string) (*domain.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, err
 		}
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrQueryFailed, err)
 	}
 
 	u.ID, err = uuid.Parse(idStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrUUIDParseFailed, err)
 	}
 
 	return &u, nil
@@ -172,7 +173,7 @@ func (r *repository) GetStats(userID uuid.UUID) (*domain.UserStats, error) {
 	).Scan(&stats.PostCount, &stats.CommentCount, &stats.LikeCount, &stats.DislikeCount)
 
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", user_repo.ErrQueryFailed, err)
 	}
 
 	return &stats, nil
