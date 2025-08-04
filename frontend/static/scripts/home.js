@@ -10,38 +10,6 @@ sortingBy.addEventListener("click", () => {
   }
 });
 
-// SORTING CHOICE:
-const sortingList = document.querySelectorAll("#sort-container-by");
-
-sortingList.forEach((el, i) => {
-  el.addEventListener("click", () => {
-    sortingList.forEach((els) => {
-      els.classList.remove("selected-li");
-    });
-    el.classList.add("selected-li");
-
-    // NEW:
-    switch (i) {
-      // Latest
-      case 0:
-        sortingBy.innerHTML = `Latest Topics: <i class="ri-arrow-drop-down-line"></i>`;
-        break;
-      // Oldest
-      case 1:
-        sortingBy.innerHTML = `Oldest Topics: <i class="ri-arrow-drop-down-line"></i>`;
-        break;
-      // Hottest
-      case 2:
-        sortingBy.innerHTML = `Hottest Topics: <i class="ri-arrow-drop-down-line"></i>`;
-        break;
-      // Rising
-      case 3:
-        sortingBy.innerHTML = `Rising Topics: <i class="ri-arrow-drop-down-line"></i>`;
-        break;
-    }
-  });
-});
-
 // LIKE/DISLIKE:
 const btnLike = document.querySelectorAll("#btn-like");
 const btnDislike = document.querySelectorAll("#btn-dislike");
@@ -61,5 +29,119 @@ btnDislike.forEach((btn, i) => {
       btnLike[i].classList.remove("btn-black");
     }
     btn.classList.toggle("btn-black");
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = Array.from(document.querySelectorAll(".cards"));
+  const tagFilters = document.querySelectorAll(".tag-filter");
+  const sortFilters = document.querySelectorAll(".sort-filter");
+
+  let selectedTags = new Set();
+  let sortBy = "new";
+
+  function renderCards() {
+    let filtered = [...cards];
+
+    if (selectedTags.size > 0) {
+      filtered = filtered.filter(card => {
+        const tags = card.dataset.tags.split(",");
+        return Array.from(selectedTags).every(tag => tags.includes(tag));
+      });
+    }
+
+    filtered.sort((a, b) => {
+      const dateA = parseInt(a.dataset.date);
+      const dateB = parseInt(b.dataset.date);
+      const likesA = parseInt(a.dataset.likes);
+      const likesB = parseInt(b.dataset.likes);
+      const commentsA = parseInt(a.dataset.comments);
+      const commentsB = parseInt(b.dataset.comments);
+
+      if (sortBy === "new") return dateB - dateA;
+      if (sortBy === "old") return dateA - dateB;
+      if (sortBy === "hot") return likesB - likesA;
+      if (sortBy === "rising") return commentsB - commentsA;
+      return 0;
+    });
+
+    cards.forEach(card => card.style.display = "none");
+    filtered.forEach(card => card.style.display = "block");
+  }
+
+  function updateTagStyles(tagName, isSelected) {
+    document.querySelectorAll(".tag-filter").forEach(tagEl => {
+      if (tagEl.textContent.trim() === tagName) {
+        tagEl.classList.toggle("selected", isSelected);
+      }
+    });
+  }
+
+  tagFilters.forEach(tag => {
+    tag.addEventListener("click", e => {
+      e.preventDefault();
+      const tagName = tag.textContent.trim();
+
+      const isSelected = selectedTags.has(tagName);
+      if (isSelected) {
+        selectedTags.delete(tagName);
+      } else {
+        selectedTags.add(tagName);
+      }
+
+      updateTagStyles(tagName, !isSelected);
+      renderCards();
+    });
+  });
+
+  sortFilters.forEach(sort => {
+    sort.addEventListener("click", e => {
+      e.preventDefault();
+      sortBy = sort.dataset.sort;
+      renderCards();
+    });
+  });
+
+  renderCards();
+});
+
+// Add JavaScript for handling likes/dislikes
+document.querySelectorAll('.btn-like').forEach(button => {
+  button.addEventListener('click', async function() {
+    const postId = this.dataset.postId;
+    try {
+      const response = await fetch(`/api/posts/${postId}/like`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        this.querySelector('.like-count').textContent = data.likes;
+        // You might also want to update the dislike count if user had disliked before
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+});
+
+// Similar for dislike button
+document.querySelectorAll('.btn-dislike').forEach(button => {
+  button.addEventListener('click', async function() {
+    const postId = this.dataset.postId;
+    try {
+      const response = await fetch(`/api/posts/${postId}/dislike`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        this.querySelector('.dislike-count').textContent = data.dislikes;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   });
 });
