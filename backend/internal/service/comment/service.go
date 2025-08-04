@@ -3,9 +3,9 @@ package comment
 import (
 	"errors"
 	"forum/internal/domain"
-	comment_repo "forum/internal/repository/sqlite/comment"
-	post_repo "forum/internal/repository/sqlite/post"
-	user_repo "forum/internal/repository/sqlite/user"
+	"forum/internal/repository/comment"
+	post_repo "forum/internal/repository/post"
+	user_repo "forum/internal/repository/user"
 	"forum/internal/service/comment/validator"
 	"forum/internal/service/post"
 	"forum/internal/service/user"
@@ -14,13 +14,13 @@ import (
 )
 
 type service struct {
-	repo      comment_repo.Repository
+	repo      comment.Repository
 	postRepo  post_repo.Repository
 	userRepo  user_repo.Repository
 	validator validator.CommentValidator
 }
 
-func New(repo comment_repo.Repository, postRepo post_repo.Repository,
+func New(repo comment.Repository, postRepo post_repo.Repository,
 	userRepo user_repo.Repository, validator validator.CommentValidator) Service {
 	return &service{
 		repo:      repo,
@@ -88,7 +88,7 @@ func (s *service) DislikeComment(commentID, userID uuid.UUID) error {
 	}
 
 	reaction, err := s.repo.GetReaction(commentID, userID)
-	if err != nil && !errors.Is(err, comment_repo.ErrReactionNotFound) {
+	if err != nil && !errors.Is(err, comment.ErrReactionNotFound) {
 		return err
 	}
 	if reaction == -1 {
