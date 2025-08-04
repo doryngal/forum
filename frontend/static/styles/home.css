@@ -45,18 +45,36 @@
   flex-flow: column nowrap;
 }
 
+/* Обрезка длинного заголовка */
 .card-info h3 {
   color: var(--black);
   font-weight: 900;
   font-size: 1.25rem;
   font-family: "Poppins", sans-serif;
   margin-bottom: 10px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* Однострочный заголовок */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
+/* Контент красиво обрезается с многоточием */
 .card-info p {
   font-weight: 400;
   color: var(--semi-black);
   text-align: justify;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Показывать до 4 строк */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  max-width: 100%;
 }
 
 .card-body .btn-container {
@@ -163,11 +181,6 @@
   font-size: 0.75rem;
 }
 
-.sort-container .selected-li {
-  color: var(--black);
-  background-color: var(--primary);
-}
-
 h5 {
   color: var(--black);
   font-weight: 900;
@@ -190,27 +203,6 @@ ul {
   width: 100%;
 }
 
-.ri-arrow-right-up-line {
-  color: var(--primary);
-}
-
-.ri-arrow-right-line {
-  color: var(--secondary);
-}
-
-.ri-arrow-right-down-line {
-  color: var(--semi-black);
-}
-
-.cardtag {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
 .right-aside .tag {
   font-size: 0.75rem;
 }
@@ -220,11 +212,6 @@ ul {
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
-}
-
-.img-container {
-  width: fit-content;
-  gap: 10px;
 }
 
 .img-container > img {
@@ -265,10 +252,6 @@ ul {
     flex-flow: column nowrap;
   }
 
-  .btn-back {
-    display: none;
-  }
-
   .card-top {
     flex-flow: column nowrap;
   }
@@ -305,4 +288,83 @@ ul {
   .right-aside .btn-special {
     width: calc(100% - 40px);
   }
+}
+
+/* ----- ✅ Новое: Карточки фиксированной ширины и ограничения текста ----- */
+.cards {
+  width: 100%;
+  max-width: 900px;
+}
+
+.card-body {
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.card-info h3 a,
+.card-info p a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-info h3 a:hover {
+  text-decoration: underline;
+}
+
+.card-info p {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* Количество строк */
+  -webkit-box-orient: vertical;
+  white-space: normal;
+}
+
+/* ----- ✅ Новое: Отображение даты ----- */
+.card-bottom-left p.created-at {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--semi-black);
+  margin: 0;
+  padding-top: 2px;
+}
+
+/* ----- ✅ Новое: Стили тегов внизу карточки ----- */
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0 0 0;
+}
+
+.tags-row .tag {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.tags-row .tag:hover {
+  background-color: #d5d5d5;
+}
+
+/* ----- ✅ На мобильных: делаем теги не ломать верстку ----- */
+@media only screen and (max-width: 580px) {
+  .tags-row {
+    justify-content: flex-start;
+  }
+}
+
+.tag.selected {
+  background-color: #0051ff;
+  color: white;
+  border-color: #003ecc;
+  box-shadow: 0 0 5px rgba(0, 81, 255, 0.5);
 }
