@@ -162,3 +162,11 @@ func (s *service) DislikePost(postID, userID uuid.UUID) error {
 
 	return s.repo.Dislike(postID, userID)
 }
+
+func (s *service) UpdatePost(post *domain.Post) error {
+	return s.repo.Update(post)
+}
+
+func (s *service) DeletePost(postID, userID uuid.UUID) error {
+	return s.repo.Delete(postID, userID)
+}

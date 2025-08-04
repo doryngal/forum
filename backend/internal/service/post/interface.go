@@ -14,4 +14,6 @@ type Service interface {
 	GetLikedPostsByUser(userID uuid.UUID) ([]*domain.Post, error)
 	LikePost(postID, userID uuid.UUID) error
 	DislikePost(postID, userID uuid.UUID) error
+	UpdatePost(post *domain.Post) error
+	DeletePost(postID, userID uuid.UUID) error
 }
