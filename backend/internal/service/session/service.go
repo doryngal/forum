@@ -5,19 +5,19 @@ import (
 	"encoding/base64"
 	"errors"
 	"forum/internal/domain"
-	session_repo "forum/internal/repository/sqlite/session"
+	"forum/internal/repository/session"
 	"forum/internal/service/session/validator"
 	"github.com/google/uuid"
 	"time"
 )
 
 type service struct {
-	repo      session_repo.Repository
+	repo      session.Repository
 	validator validator.SessionValidator
 	duration  time.Duration
 }
 
-func New(repo session_repo.Repository, validator validator.SessionValidator) Service {
+func New(repo session.Repository, validator validator.SessionValidator) Service {
 	return &service{
 		repo:      repo,
 		validator: validator,
@@ -55,7 +55,7 @@ func (s *service) GetByToken(token string) (*domain.Session, error) {
 
 	session, err := s.repo.GetByToken(token)
 	if err != nil {
-		if errors.Is(err, session_repo.ErrSessionExpired) {
+		if errors.Is(err, session.ErrSessionExpired) {
 			return nil, errors.Join(ErrSessionExpired, err)
 		}
 		return nil, errors.Join(ErrSessionNotFound, err)
@@ -71,7 +71,7 @@ func (s *service) GetByUserID(userID uuid.UUID) (*domain.Session, error) {
 
 	session, err := s.repo.GetByUserID(userID)
 	if err != nil {
-		if errors.Is(err, session_repo.ErrSessionExpired) {
+		if errors.Is(err, session.ErrSessionExpired) {
 			return nil, errors.Join(ErrSessionExpired, err)
 		}
 		return nil, errors.Join(ErrSessionNotFound, err)
@@ -86,7 +86,7 @@ func (s *service) Delete(token string) error {
 	}
 
 	if err := s.repo.Delete(token); err != nil {
-		if errors.Is(err, session_repo.ErrSessionNotFound) {
+		if errors.Is(err, session.ErrSessionNotFound) {
 			return errors.Join(ErrSessionNotFound, err)
 		}
 		return err
@@ -97,7 +97,7 @@ func (s *service) Delete(token string) error {
 
 func (s *service) DeleteByUserID(userID uuid.UUID) error {
 	if err := s.repo.DeleteByUserID(userID); err != nil {
-		if errors.Is(err, session_repo.ErrSessionNotFound) {
+		if errors.Is(err, session.ErrSessionNotFound) {
 			return errors.Join(ErrSessionNotFound, err)
 		}
 		return err
