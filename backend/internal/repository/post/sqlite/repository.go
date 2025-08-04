@@ -1,9 +1,10 @@
-package post
+package sqlite
 
 import (
 	"database/sql"
 	"fmt"
 	"forum/internal/domain"
+	post2 "forum/internal/repository/post"
 	"github.com/google/uuid"
 	"time"
 )
@@ -12,7 +13,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) Repository {
+func New(db *sql.DB) post2.Repository {
 	return &repository{db: db}
 }
 
@@ -24,7 +25,7 @@ func (r repository) Create(post *domain.Post) error {
 		post.ID.String(), post.UserID.String(), post.Title, post.Content, post.CreatedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrInsertPostFailed, err)
+		return fmt.Errorf("%w: %v", post.ErrInsertPostFailed, err)
 	}
 	return nil
 }
@@ -49,21 +50,21 @@ func (r repository) GetByID(id uuid.UUID) (*domain.Post, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrQueryFailed, err)
 	}
 	p.ID, err = uuid.Parse(idStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 	}
 	p.UserID, err = uuid.Parse(userIDStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 	}
 
 	// Load categories for the post
 	categories, err := r.getPostCategories(p.ID)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrLoadCategoriesFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrLoadCategoriesFailed, err)
 	}
 	p.Categories = categories
 
@@ -77,7 +78,7 @@ func (r repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, err
 		JOIN post_categories pc ON c.id = pc.category_id
 		WHERE pc.post_id = ?`, postID.String())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -86,11 +87,11 @@ func (r repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, err
 		var c domain.Category
 		var idStr string
 		if err := rows.Scan(&idStr, &c.Name); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrScanFailed, err)
 		}
 		c.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		categories = append(categories, &c)
 	}
@@ -110,7 +111,7 @@ func (r repository) GetAll() ([]*domain.Post, error) {
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -120,15 +121,15 @@ func (r repository) GetAll() ([]*domain.Post, error) {
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -160,7 +161,7 @@ func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) 
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`, categoryID.String())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -170,15 +171,15 @@ func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) 
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -209,7 +210,7 @@ func (r repository) GetByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`, userID.String())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -219,15 +220,15 @@ func (r repository) GetByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -258,7 +259,7 @@ func (r repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
 		GROUP BY p.id
 		ORDER BY p.created_at DESC`, userID.String())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrQueryFailed, err)
+		return nil, fmt.Errorf("%w: %v", post2.ErrQueryFailed, err)
 	}
 	defer rows.Close()
 
@@ -268,15 +269,15 @@ func (r repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
 		var idStr, userIDStr string
 		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
 			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrScanFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrScanFailed, err)
 		}
 		p.ID, err = uuid.Parse(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		p.UserID, err = uuid.Parse(userIDStr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrUUIDParseFailed, err)
+			return nil, fmt.Errorf("%w: %v", post2.ErrUUIDParseFailed, err)
 		}
 		posts = append(posts, &p)
 	}
@@ -310,7 +311,7 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 	).Scan(&existingReaction)
 
 	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+		return fmt.Errorf("%w: %v", post2.ErrReactionUpdateFailed, err)
 	}
 
 	if err == nil {
@@ -322,7 +323,7 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 				WHERE user_id = ? AND post_id = ?`,
 				userID.String(), postID.String())
 			if err != nil {
-				return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+				return fmt.Errorf("%w: %v", post2.ErrReactionUpdateFailed, err)
 			}
 			return nil
 		}
@@ -333,7 +334,7 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 			WHERE user_id = ? AND post_id = ?`,
 			reaction, userID.String(), postID.String())
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+			return fmt.Errorf("%w: %v", post2.ErrReactionUpdateFailed, err)
 		}
 		return nil
 	}
@@ -344,7 +345,7 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 		VALUES (?, ?, ?)`,
 		userID.String(), postID.String(), reaction)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrReactionUpdateFailed, err)
+		return fmt.Errorf("%w: %v", post2.ErrReactionUpdateFailed, err)
 	}
 	return nil
 }
@@ -365,9 +366,9 @@ func (r repository) GetReaction(postID, userID uuid.UUID) (int, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, ErrReactionNotFound
+			return 0, post2.ErrReactionNotFound
 		}
-		return 0, fmt.Errorf("%w: %v", ErrGetReactionFailed, err)
+		return 0, fmt.Errorf("%w: %v", post2.ErrGetReactionFailed, err)
 	}
 
 	return reaction, nil
