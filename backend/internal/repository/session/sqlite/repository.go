@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/domain"
-	session2 "forum/internal/repository/session"
+	session_repo "forum/internal/repository/session"
 	"github.com/google/uuid"
 	"time"
 )
@@ -14,7 +14,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) session2.Repository {
+func New(db *sql.DB) session_repo.Repository {
 	return &repository{db: db}
 }
 
@@ -22,7 +22,7 @@ func (r *repository) Create(session *domain.Session) error {
 	query := `INSERT INTO sessions (id, user_id, expires_at) VALUES ($1, $2, $3)`
 	_, err := r.db.Exec(query, session.ID, session.UserID, session.ExpiresAt)
 	if err != nil {
-		return errors.Join(session.ErrCreateSession, err)
+		return errors.Join(session_repo.ErrCreateSession, err)
 	}
 	return nil
 }
@@ -35,13 +35,13 @@ func (r *repository) GetByToken(token string) (*domain.Session, error) {
 	err := row.Scan(&session.ID, &session.UserID, &session.ExpiresAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, session.ErrSessionNotFound
+			return nil, session_repo.ErrSessionNotFound
 		}
 		return nil, err
 	}
 
 	if session.ExpiresAt.Before(time.Now()) {
-		return nil, session.ErrSessionExpired
+		return nil, session_repo.ErrSessionExpired
 	}
 
 	return &session, nil
@@ -55,13 +55,13 @@ func (r *repository) GetByUserID(userID uuid.UUID) (*domain.Session, error) {
 	err := row.Scan(&session.ID, &session.UserID, &session.ExpiresAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, session.ErrSessionNotFound
+			return nil, session_repo.ErrSessionNotFound
 		}
 		return nil, err
 	}
 
 	if session.ExpiresAt.Before(time.Now()) {
-		return nil, session.ErrSessionExpired
+		return nil, session_repo.ErrSessionExpired
 	}
 
 	return &session, nil
@@ -71,7 +71,7 @@ func (r *repository) Delete(token string) error {
 	query := `DELETE FROM sessions WHERE id = $1`
 	res, err := r.db.Exec(query, token)
 	if err != nil {
-		return errors.Join(session2.ErrDeleteSession, err)
+		return errors.Join(session_repo.ErrDeleteSession, err)
 	}
 
 	rowsAffected, err := res.RowsAffected()
@@ -80,7 +80,7 @@ func (r *repository) Delete(token string) error {
 	}
 
 	if rowsAffected == 0 {
-		return session2.ErrSessionNotFound
+		return session_repo.ErrSessionNotFound
 	}
 
 	return nil
@@ -91,12 +91,12 @@ func (r *repository) DeleteByUserID(userID uuid.UUID) error {
 
 	res, err := r.db.Exec(query, userID.String())
 	if err != nil {
-		return fmt.Errorf("%w: %w", session2.ErrDeleteSession, err)
+		return fmt.Errorf("%w: %w", session_repo.ErrDeleteSession, err)
 	}
 
 	_, err = res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("%w: %w", session2.ErrAffectedRowsCheckFail, err)
+		return fmt.Errorf("%w: %w", session_repo.ErrAffectedRowsCheckFail, err)
 	}
 
 	return nil
