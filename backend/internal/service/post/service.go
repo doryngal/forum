@@ -88,7 +88,7 @@ func (s *service) GetPostsByCategory(categoryID uuid.UUID) ([]*domain.Post, erro
 	return s.repo.GetByCategory(categoryID)
 }
 
-func (s *service) GetPostsByUser(userID uuid.UUID) ([]*domain.Post, error) {
+func (s *service) GetPostsByUserID(userID, sessionID uuid.UUID) ([]*domain.Post, error) {
 	if userID == uuid.Nil {
 		return nil, user.ErrUserNotFound
 	}
@@ -101,7 +101,7 @@ func (s *service) GetPostsByUser(userID uuid.UUID) ([]*domain.Post, error) {
 		return nil, user.ErrUserNotFound
 	}
 
-	return s.repo.GetByUserID(userID)
+	return s.repo.GetByUserID(userID, sessionID)
 }
 
 func (s *service) GetLikedPostsByUser(userID uuid.UUID) ([]*domain.Post, error) {
@@ -152,12 +152,9 @@ func (s *service) DislikePost(postID, userID uuid.UUID) error {
 		return user.ErrUserNotFound
 	}
 
-	reaction, err := s.repo.GetReaction(postID, userID)
+	_, err := s.repo.GetReaction(postID, userID)
 	if err != nil && !errors.Is(err, post2.ErrReactionNotFound) {
 		return err
-	}
-	if reaction == -1 {
-		return ErrAlreadyReacted
 	}
 
 	return s.repo.Dislike(postID, userID)
@@ -169,4 +166,12 @@ func (s *service) UpdatePost(post *domain.Post) error {
 
 func (s *service) DeletePost(postID, userID uuid.UUID) error {
 	return s.repo.Delete(postID, userID)
+}
+
+func (s *service) GetLikedPosts(userID uuid.UUID) ([]*domain.Post, error) {
+	return s.repo.GetLikedPostsByUserID(userID)
+}
+
+func (s *service) GetDislikedPosts(userID uuid.UUID) ([]*domain.Post, error) {
+	return s.repo.GetDislikedPostsByUserID(userID)
 }

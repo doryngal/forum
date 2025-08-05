@@ -10,4 +10,5 @@ type Service interface {
 	GetCommentsByPost(postID uuid.UUID) ([]*domain.Comment, error)
 	LikeComment(commentID, userID uuid.UUID) error
 	DislikeComment(commentID, userID uuid.UUID) error
+	GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error)
 }

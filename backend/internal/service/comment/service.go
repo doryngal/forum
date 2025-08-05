@@ -97,3 +97,7 @@ func (s *service) DislikeComment(commentID, userID uuid.UUID) error {
 
 	return s.repo.Dislike(commentID, userID)
 }
+
+func (s *service) GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error) {
+	return s.repo.GetCommentsByUserID(userID)
+}
