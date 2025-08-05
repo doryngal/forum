@@ -2,6 +2,7 @@ package profile
 
 import (
 	"forum/internal/domain"
+	"forum/internal/service/comment"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
@@ -15,6 +16,7 @@ type ProfileHandler struct {
 	tmpl           *template.Template
 	userService    user.Service
 	postService    post.Service
+	commentService comment.Service
 	sessionService session.Service
 }
 
@@ -22,12 +24,14 @@ func NewProfileHandler(
 	tmpl *template.Template,
 	userService user.Service,
 	postService post.Service,
+	commentService comment.Service,
 	sessionService session.Service,
 ) *ProfileHandler {
 	return &ProfileHandler{
 		tmpl:           tmpl,
 		userService:    userService,
 		postService:    postService,
+		commentService: commentService,
 		sessionService: sessionService,
 	}
 }
@@ -51,6 +55,8 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, "/", http.StatusFound)
+	case http.MethodPost:
+		h.handleAction(w, r)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -75,32 +81,80 @@ func (h *ProfileHandler) handleOwnProfile(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	h.renderProfilePage(w, user)
+	h.renderProfilePage(w, user, user.ID)
 }
 
-func (h *ProfileHandler) renderProfilePage(w http.ResponseWriter, user *domain.User) {
-	stats, err := h.userService.GetUserStats(user.ID)
-	if err != nil {
-		http.Error(w, "Failed to get user stats", http.StatusInternalServerError)
+func (h *ProfileHandler) handleAction(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	posts, err := h.postService.GetPostsByUser(user.ID)
+	userID, err := h.getUserIDFromSession(r)
 	if err != nil {
-		http.Error(w, "Failed to get user posts", http.StatusInternalServerError)
+		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
 
-	data := domain.ProfileData{
-		User:  user,
-		Stats: stats,
-		Posts: posts,
+	action := r.FormValue("action")
+	postIDStr := r.FormValue("post_id")
+	postID, err := uuid.Parse(postIDStr)
+	if err != nil {
+		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		return
 	}
 
-	err = h.tmpl.ExecuteTemplate(w, "profile.html", data)
-	if err != nil {
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+	switch action {
+	case "like":
+		err = h.postService.LikePost(postID, userID)
+	case "dislike":
+		err = h.postService.DislikePost(postID, userID)
+	default:
+		http.Error(w, "Unknown action", http.StatusBadRequest)
+		return
 	}
+
+	if err != nil {
+		http.Error(w, "Action failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+}
+
+func (h *ProfileHandler) getUserIDFromSession(r *http.Request) (uuid.UUID, error) {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	sess, err := h.sessionService.GetByToken(cookie.Value)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return sess.UserID, nil
+}
+
+func (h *ProfileHandler) renderProfilePage(w http.ResponseWriter, user *domain.User, sessionID uuid.UUID) {
+	createdPosts, _ := h.postService.GetPostsByUserID(user.ID, sessionID)
+	likedPosts, _ := h.postService.GetLikedPosts(user.ID)
+	dislikedPosts, _ := h.postService.GetDislikedPosts(user.ID)
+	comments, _ := h.commentService.GetCommentsByUserID(user.ID) // Или commentService
+
+	h.tmpl.ExecuteTemplate(w, "profile.html", map[string]interface{}{
+		"User":          user,
+		"Posts":         createdPosts,
+		"LikedPosts":    likedPosts,
+		"DislikedPosts": dislikedPosts,
+		"Comments":      comments,
+		"Stats": map[string]int{
+			"PostCount":    len(createdPosts),
+			"LikeCount":    len(likedPosts),
+			"DislikeCount": len(dislikedPosts),
+			"CommentCount": len(comments),
+		},
+	})
 }
 
 func (h *ProfileHandler) handleGetProfile(w http.ResponseWriter, r *http.Request, username string) {
@@ -109,5 +163,8 @@ func (h *ProfileHandler) handleGetProfile(w http.ResponseWriter, r *http.Request
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
-	h.renderProfilePage(w, user)
+
+	sessionID, _ := h.getUserIDFromSession(r)
+
+	h.renderProfilePage(w, user, sessionID)
 }
