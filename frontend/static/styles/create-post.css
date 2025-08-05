@@ -138,3 +138,8 @@ input:-webkit-autofill:active {
     flex-flow: column nowrap;
   }
 }
+
+.category-checkboxes label {
+  margin-right: 10px;
+  font-size: 14px;
+}
