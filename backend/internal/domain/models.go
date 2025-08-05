@@ -24,7 +24,6 @@ type Session struct {
 type Post struct {
 	ID             uuid.UUID   `json:"id"`
 	UserID         uuid.UUID   `json:"user_id"`
-	ImageURL       string      `json:"image_url"`
 	Title          string      `json:"title"`
 	Content        string      `json:"content"`
 	CreatedAt      time.Time   `json:"created_at"`
@@ -34,6 +33,15 @@ type Post struct {
 	CommentsCount  int         `json:"comments_count"`
 	Categories     []*Category `json:"categories,omitempty"`
 	Tags           []string    `json:"tags,omitempty"`
+	IsOwner        bool        `json:"is_owner"`
+}
+
+type CommentWithPostTitle struct {
+	ID        uuid.UUID
+	Content   string
+	PostID    uuid.UUID
+	PostTitle string
+	CreatedAt time.Time
 }
 
 type Category struct {
