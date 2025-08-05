@@ -3,6 +3,7 @@ package post
 import (
 	"errors"
 	"forum/internal/domain"
+	"forum/internal/service/category"
 	"forum/internal/service/comment"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
@@ -16,20 +17,22 @@ import (
 )
 
 type PostHandler struct {
-	tmpl           *template.Template
-	userService    user.Service
-	postService    post.Service
-	commentService comment.Service
-	sessionService session.Service
+	tmpl            *template.Template
+	userService     user.Service
+	postService     post.Service
+	commentService  comment.Service
+	sessionService  session.Service
+	categoryService category.Service
 }
 
-func NewPostHandler(tmpl *template.Template, userService user.Service, postService post.Service, commentService comment.Service, sessionService session.Service) *PostHandler {
+func NewPostHandler(tmpl *template.Template, us user.Service, ps post.Service, cs comment.Service, ss session.Service, cts category.Service) *PostHandler {
 	return &PostHandler{
-		tmpl:           tmpl,
-		userService:    userService,
-		postService:    postService,
-		commentService: commentService,
-		sessionService: sessionService,
+		tmpl:            tmpl,
+		userService:     us,
+		postService:     ps,
+		commentService:  cs,
+		sessionService:  ss,
+		categoryService: cts,
 	}
 }
 
@@ -52,11 +55,12 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type PostData struct {
-	Post     *domain.Post
-	Comments []*domain.Comment
-	Error    string
-	Success  string
-	User     *domain.User
+	Post       *domain.Post
+	Comments   []*domain.Comment
+	Error      string
+	Success    string
+	User       *domain.User
+	Categories []*domain.Category
 }
 
 func (h *PostHandler) handleGetPost(w http.ResponseWriter, r *http.Request, postID uuid.UUID) {
@@ -72,9 +76,15 @@ func (h *PostHandler) handleGetPost(w http.ResponseWriter, r *http.Request, post
 		return
 	}
 
+	categories, err := h.categoryService.GetAllCategories()
+	if err != nil {
+		categories = nil
+	}
+
 	data := PostData{
-		Post:     post,
-		Comments: comments,
+		Post:       post,
+		Comments:   comments,
+		Categories: categories,
 	}
 
 	// Добавляем информацию о пользователе из сессии
