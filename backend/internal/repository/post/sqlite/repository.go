@@ -215,7 +215,7 @@ func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) 
 	return posts, nil
 }
 
-func (r repository) GetByUserID(userID uuid.UUID) ([]*domain.Post, error) {
+func (r repository) GetByUserID(userID, sessionID uuid.UUID) ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at, 
 		       u.username, 
@@ -259,6 +259,7 @@ func (r repository) GetByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 			return nil, err
 		}
 		post.Categories = categories
+		post.IsOwner = post.UserID == sessionID
 	}
 
 	return posts, nil
@@ -391,4 +392,74 @@ func (r repository) GetReaction(postID, userID uuid.UUID) (int, error) {
 	}
 
 	return reaction, nil
+}
+
+func (r repository) GetLikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, error) {
+	rows, err := r.db.Query(`
+		SELECT p.id, p.user_id, p.title, p.content, p.created_at,
+		       u.username,
+		       COALESCE(SUM(CASE WHEN pr.reaction = 1 THEN 1 ELSE 0 END), 0) as likes,
+		       COALESCE(SUM(CASE WHEN pr.reaction = -1 THEN 1 ELSE 0 END), 0) as dislikes,
+		       (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) as comments_count
+		FROM posts p
+		JOIN post_reactions r2 ON p.id = r2.post_id AND r2.user_id = ? AND r2.reaction = 1
+		JOIN users u ON p.user_id = u.id
+		LEFT JOIN post_reactions pr ON p.id = pr.post_id
+		GROUP BY p.id
+		ORDER BY p.created_at DESC`, userID.String())
+	if err != nil {
+		return nil, fmt.Errorf("GetLikedPostsByUserID query failed: %v", err)
+	}
+	defer rows.Close()
+
+	return r.scanPosts(rows)
+}
+
+func (r repository) GetDislikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, error) {
+	rows, err := r.db.Query(`
+		SELECT p.id, p.user_id, p.title, p.content, p.created_at,
+		       u.username,
+		       COALESCE(SUM(CASE WHEN pr.reaction = 1 THEN 1 ELSE 0 END), 0) as likes,
+		       COALESCE(SUM(CASE WHEN pr.reaction = -1 THEN 1 ELSE 0 END), 0) as dislikes,
+		       (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) as comments_count
+		FROM posts p
+		JOIN post_reactions r2 ON p.id = r2.post_id AND r2.user_id = ? AND r2.reaction = -1
+		JOIN users u ON p.user_id = u.id
+		LEFT JOIN post_reactions pr ON p.id = pr.post_id
+		GROUP BY p.id
+		ORDER BY p.created_at DESC`, userID.String())
+	if err != nil {
+		return nil, fmt.Errorf("GetDislikedPostsByUserID query failed: %v", err)
+	}
+	defer rows.Close()
+
+	return r.scanPosts(rows)
+}
+
+func (r repository) scanPosts(rows *sql.Rows) ([]*domain.Post, error) {
+	var posts []*domain.Post
+	for rows.Next() {
+		var p domain.Post
+		var idStr, userIDStr string
+		if err := rows.Scan(&idStr, &userIDStr, &p.Title, &p.Content, &p.CreatedAt,
+			&p.AuthorUsername, &p.Likes, &p.Dislikes, &p.CommentsCount); err != nil {
+			return nil, fmt.Errorf("scanPosts: %v", err)
+		}
+		var err error
+		p.ID, err = uuid.Parse(idStr)
+		if err != nil {
+			return nil, err
+		}
+		p.UserID, err = uuid.Parse(userIDStr)
+		if err != nil {
+			return nil, err
+		}
+		categories, err := r.getPostCategories(p.ID)
+		if err != nil {
+			return nil, err
+		}
+		p.Categories = categories
+		posts = append(posts, &p)
+	}
+	return posts, nil
 }
