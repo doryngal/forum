@@ -2,28 +2,34 @@ package post
 
 import (
 	"errors"
+	"fmt"
 	"forum/internal/domain"
+	"forum/internal/service/category"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
+	"github.com/google/uuid"
 	"html/template"
+	"log"
 	"net/http"
 	"strings"
 )
 
 type CreateHandler struct {
-	tmpl           *template.Template
-	userService    user.Service
-	postService    post.Service
-	sessionService session.Service
+	tmpl            *template.Template
+	userService     user.Service
+	postService     post.Service
+	sessionService  session.Service
+	categoryService category.Service
 }
 
-func NewCreateHandler(tmpl *template.Template, userService user.Service, postService post.Service, sessionService session.Service) *CreateHandler {
+func NewCreateHandler(tmpl *template.Template, userService user.Service, postService post.Service, sessionService session.Service, categoryService category.Service) *CreateHandler {
 	return &CreateHandler{
-		tmpl:           tmpl,
-		userService:    userService,
-		postService:    postService,
-		sessionService: sessionService,
+		tmpl:            tmpl,
+		userService:     userService,
+		postService:     postService,
+		sessionService:  sessionService,
+		categoryService: categoryService,
 	}
 }
 
@@ -39,9 +45,11 @@ func (h *CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type CreatePostData struct {
-	Error string
-	Form  map[string]string
-	User  *domain.User
+	Error              string
+	Form               map[string]string
+	SelectedCategories []string
+	User               *domain.User
+	Categories         []*domain.Category
 }
 
 func (h *CreateHandler) renderCreateForm(w http.ResponseWriter, r *http.Request, data *CreatePostData) {
@@ -49,7 +57,7 @@ func (h *CreateHandler) renderCreateForm(w http.ResponseWriter, r *http.Request,
 		data = &CreatePostData{}
 	}
 
-	// Добавляем информацию о пользователе из сессии
+	// Получаем пользователя
 	cookie, err := r.Cookie("session_id")
 	if err == nil && cookie.Value != "" {
 		sess, err := h.sessionService.GetByToken(cookie.Value)
@@ -58,8 +66,14 @@ func (h *CreateHandler) renderCreateForm(w http.ResponseWriter, r *http.Request,
 		}
 	}
 
+	// Получаем категории
+	categories, err := h.categoryService.GetAllCategories()
+	if err == nil {
+		data.Categories = categories
+	}
+
 	if err := h.tmpl.ExecuteTemplate(w, "create-post.html", data); err != nil {
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		log.Printf("Template rendering error: %v", err)
 	}
 }
 
@@ -76,11 +90,13 @@ func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request)
 		"tags":    strings.TrimSpace(r.FormValue("tags")),
 		"content": r.FormValue("message"),
 	}
+	selectedCategories := r.Form["categories"]
 
 	if len(formData["title"]) == 0 {
 		h.renderCreateForm(w, r, &CreatePostData{
-			Error: "Title is required",
-			Form:  formData,
+			Error:              "Title is required",
+			Form:               formData,
+			SelectedCategories: selectedCategories,
 		})
 		return
 	}
@@ -91,7 +107,28 @@ func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	categoryIDs := r.Form["categories"] // slice of selected category IDs (as strings)
+	fmt.Println(categoryIDs)
+	var categoryUUIDs []uuid.UUID
+	for _, idStr := range categoryIDs {
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			log.Printf("Invalid UUID: %s, error: %v", idStr, err)
+			continue // или return, если важно прервать
+		}
+		categoryUUIDs = append(categoryUUIDs, id)
+	}
+
+	if len(categoryUUIDs) == 0 {
+		h.renderCreateForm(w, r, &CreatePostData{
+			Error: "At least one category must be selected",
+			Form:  formData,
+		})
+		return
+	}
+
 	post := &domain.Post{
+		ID:      uuid.New(),
 		Title:   formData["title"],
 		Content: formData["content"],
 		UserID:  user.ID,
@@ -99,8 +136,19 @@ func (h *CreateHandler) handleCreatePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := h.postService.CreatePost(post); err != nil {
+		log.Printf("Failed to create post: %v", err)
 		h.renderCreateForm(w, r, &CreatePostData{
 			Error: "Failed to create post: " + err.Error(),
+			Form:  formData,
+		})
+		return
+	}
+
+	err = h.categoryService.AssignCategoriesToPost(post.ID, categoryUUIDs)
+	if err != nil {
+		log.Printf("Failed to assign categories: %v", err)
+		h.renderCreateForm(w, r, &CreatePostData{
+			Error: "Failed to assign categories to post: " + err.Error(),
 			Form:  formData,
 		})
 		return
