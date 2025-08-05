@@ -48,77 +48,7 @@
             </div>
 
             {{range .Posts}}
-            <div class="cards"
-                 data-tags="{{range $i, $c := .Categories}}{{if $i}},{{end}}{{.Name}}{{end}}"
-                 data-date="{{.CreatedAt.Unix}}"
-                 data-likes="{{.Likes}}"
-                 data-comments="{{.CommentsCount}}">
-              <div class="card-body">
-                <div class="card-top">
-                  <div class="card-info">
-                    <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-                    <p>
-                      <a href="/post/{{.ID}}">
-                        {{.Content}}
-                      </a>
-                    </p>
-                  </div>
-                  <div class="btn-container">
-
-                    <!-- Like Form -->
-                    <form method="POST" action="/" class="like-form" data-post-id="{{.ID}}">
-                      <input type="hidden" name="action" value="like">
-                      <input type="hidden" name="post_id" value="{{.ID}}">
-                      <button type="submit" class="btn btn-white btn-like" data-post-id="{{.ID}}">
-                        <i class="ri-thumb-up-line"></i>
-                        <span class="like-count">{{.Likes}}</span>
-                      </button>
-                    </form>
-
-                    <!-- Dislike Form -->
-                    <form method="POST" action="/" class="dislike-form" data-post-id="{{.ID}}">
-                      <input type="hidden" name="action" value="dislike">
-                      <input type="hidden" name="post_id" value="{{.ID}}">
-                      <button type="submit" class="btn btn-white btn-dislike" data-post-id="{{.ID}}">
-                        <i class="ri-thumb-down-line"></i>
-                        <span class="dislike-count">{{.Dislikes}}</span>
-                      </button>
-                    </form>
-
-                  </div>
-                </div>
-                <div class="horizontal-rule"></div>
-                <div class="card-bottom">
-                  <a href="/profile/{{.AuthorUsername}}" class="card-bottom-left">
-                    <img
-                            src="https://source.boringavatars.com/beam/40/{{.AuthorUsername}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A"
-                            alt=""
-                    />
-                    <div>
-                      <h4>@{{.AuthorUsername}}</h4>
-                      <p class="created-at">{{.CreatedAt.Format "02 Jan 2006 15:04"}}</p>
-                    </div>
-                  </a>
-
-                  <div class="card-bottom-right">
-                    <a href="/post/{{.ID}}">
-                      <button class="btn btn-black">
-                        {{.CommentsCount}} comments <i class="ri-chat-forward-line"></i>
-                      </button>
-                    </a>
-                  </div>
-                </div>
-
-                <!-- Tags -->
-                {{if .Categories}}
-                <div class="tags-row">
-                  {{range .Categories}}
-                  <a href="#" class="tag tag-filter">{{.Name}}</a>
-                  {{end}}
-                </div>
-                {{end}}
-              </div>
-            </div>
+            {{ template "post-section" . }}
             {{end}}
 
           </section>
