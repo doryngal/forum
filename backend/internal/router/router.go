@@ -60,6 +60,9 @@ func registerHTMLRoutes(mux *http.ServeMux, h *html.TemplateHandlers) {
 
 	mux.HandleFunc("/profile", h.Profile.ServeHTTP)
 	mux.HandleFunc("/profile/", h.Profile.ServeHTTP)
+
+	mux.HandleFunc("/edit-post/{postID}", h.EditPost.ServeHTTP)
+	mux.HandleFunc("/delete-post/{postID}", h.DeletePost.ServeHTTP)
 }
 
 func truncate(s string, length int) string {
