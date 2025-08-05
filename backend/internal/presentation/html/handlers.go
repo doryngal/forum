@@ -16,6 +16,8 @@ type TemplateHandlers struct {
 
 	Post       *post.PostHandler
 	CreatePost *post.CreateHandler
+	EditPost   *post.EditHandler
+	DeletePost *post.DeleteHandler
 
 	Profile *profile.ProfileHandler
 }
@@ -25,9 +27,10 @@ func NewTemplateHandlers(tmpl *template.Template, services *service.Service) *Te
 		Home:       home.NewHomeHandler(tmpl, services.Post, services.User, services.Category, services.Session),
 		Login:      auth.NewLoginHandler(tmpl, services.User, services.Session),
 		Register:   auth.NewRegisterHandler(tmpl, services.User),
-		Post:       post.NewPostHandler(tmpl, services.User, services.Post, services.Comment, services.Session),
+		Post:       post.NewPostHandler(tmpl, services.User, services.Post, services.Comment, services.Session, services.Category),
 		CreatePost: post.NewCreateHandler(tmpl, services.User, services.Post, services.Session, services.Category),
-
-		Profile: profile.NewProfileHandler(tmpl, services.User, services.Post, services.Session),
+		EditPost:   post.NewEditHandler(tmpl, services.Post, services.User, services.Session, services.Category),
+		DeletePost: post.NewDeleteHandler(services.Post, services.Session, services.User),
+		Profile:    profile.NewProfileHandler(tmpl, services.User, services.Post, services.Comment, services.Session),
 	}
 }
