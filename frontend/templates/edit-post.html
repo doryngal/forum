@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{template "head" .}}
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/app.css" />
+    <link rel="stylesheet" href="/static/styles/create-post.css" />
+    <title>Okumi - Edit Post</title>
+</head>
+<body>
+<main class="main" id="main">
+    {{template "navbar" .}}
+    <div class="main-back" id="main-back">
+        <div class="main-wrapper">
+            <div class="btn-container">
+                <a href="/" class="btn btn-primary btn-back" id="btn-back" accesskey="b" title="Go Back">
+                    <i class="ri-arrow-go-back-line"></i>
+                </a>
+            </div>
+
+            <h2 class="title bw-100">Edit Post</h2>
+
+            {{if .Error}}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                {{.Error}}
+            </div>
+            {{end}}
+
+            <form action="/edit-post/{{.Post.ID}}" class="form-vertical" method="POST">
+                <div class="form-control">
+                    <div class="form-wrapper">
+                        <input
+                                class="input-field"
+                                type="text"
+                                name="title"
+                                id="title"
+                                required
+                                maxlength="100"
+                                autocomplete="off"
+                                accesskey="1"
+                                value="{{.Post.Title}}"
+                        />
+                        <div class="horizontal-rule">
+                            <div class="horizontal-shadow"></div>
+                        </div>
+                    </div>
+                    <label class="control-label" for="title">Title: max 100 symbols</label>
+                </div>
+
+                <label class="control-label">Select Categories:</label>
+                <div class="form-control">
+                    <div class="category-checkboxes">
+                        {{range .Categories}}
+                        {{ $catID := .ID }}
+                        <label>
+                            <input
+                                    type="checkbox"
+                                    name="categories"
+                                    value="{{.ID}}"
+                                    {{range $.SelectedCategories}}{{if eq .ID $catID}}checked{{end}}{{end}}
+                            />
+                            {{.Name}}
+                        </label><br>
+                        {{end}}
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <div class="form-wrapper">
+                <textarea
+                        class="input-field"
+                        name="message"
+                        id="message"
+                        required
+                        maxlength="2400"
+                        accesskey="3"
+                        cols="30"
+                        rows="10"
+                >{{.Post.Content}}</textarea>
+                        <div class="horizontal-rule">
+                            <div class="horizontal-shadow"></div>
+                        </div>
+                    </div>
+                    <label class="control-label" for="message">Message: max 2400 symbols</label>
+                </div>
+
+                <button type="submit" class="btn bw-100 btn-primary">Update Post</button>
+            </form>
+        </div>
+    </div>
+</main>
+<script src="/static/scripts/main.js"></script>
+<script src="/static/scripts/app.js"></script>
+<script src="/static/scripts/create-post.js"></script>
+</body>
+</html>
