@@ -28,7 +28,7 @@
           <h2 class="title bw-100">New Post</h2>
 
           {{if .Error}}
-          <div class="alert alert-error">
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
             {{.Error}}
           </div>
           {{end}}
@@ -55,24 +55,25 @@
               <label class="control-label" for="title">Title: max 100 symbols</label>
             </div>
 
+            <label class="control-label">Select Categories:</label>
             <div class="form-control">
-              <div class="form-wrapper">
-                <input
-                        class="input-field"
-                        type="text"
-                        name="tags"
-                        id="tags"
-                        required
-                        maxlength="100"
-                        autocomplete="off"
-                        accesskey="2"
-                        {{if .Form.tags}}value="{{.Form.tags}}"{{end}}
-                />
-                <div class="horizontal-rule">
-                  <div class="horizontal-shadow"></div>
-                </div>
+              <div class="category-checkboxes">
+                {{range .Categories}}
+                <label>
+                  <input
+                          type="checkbox"
+                          name="categories"
+                          value="{{.ID}}"
+                          {{if $.SelectedCategories}}
+                          {{range $.SelectedCategories}}
+                          {{if eq . $.ID.String}}checked{{end}}
+                          {{end}}
+                          {{end}}
+                  />
+                  {{.Name}}
+                </label><br>
+                {{end}}
               </div>
-              <label class="control-label" for="tags">Tags: max 5 tags, divided by `space`</label>
             </div>
 
             <div class="form-control">
