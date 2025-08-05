@@ -172,6 +172,13 @@ body {
   left: 200px;
 }
 
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 /* Buttons */
 
 .btn {

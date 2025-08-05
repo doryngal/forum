@@ -7,6 +7,18 @@
   margin-bottom: 20px;
 }
 
+.cards-list {
+  flex: 7 0 520px;
+  max-width: 920px;
+  min-width: none;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  transition: all 0.4s;
+}
+
 .profile-container {
   display: flex;
   flex-flow: column nowrap;
@@ -93,6 +105,11 @@ strong::before {
   justify-content: center;
   align-items: center;
   gap: 12px;
+
+  width: 100%;
+  max-width: 900px; /* ограничение по ширине */
+  padding: 0 20px;   /* немного отступов по бокам */
+  box-sizing: border-box;
 }
 
 .post-card {
@@ -138,4 +155,329 @@ strong::before {
 
 .post-card-info .btn {
   /* padding: 0; */
+}
+
+.posts {
+  display: none;
+}
+.posts.active {
+  display: block;
+}
+
+ .cards {
+   display: flex;
+   flex-flow: column nowrap;
+   justify-content: center;
+   align-items: center;
+ }
+
+.card-body {
+  display: flex;
+  flex-flow: column nowrap;
+  border-radius: 4px;
+  background-color: transparent;
+  border: 1px solid var(--semi-white);
+  padding: 20px;
+  gap: 10px;
+}
+
+.card-top {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 25px;
+}
+
+.card-info {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+/* Обрезка длинного заголовка */
+.card-info h3 {
+  color: var(--black);
+  font-weight: 900;
+  font-size: 1.25rem;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 10px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* Однострочный заголовок */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Контент красиво обрезается с многоточием */
+.card-info p {
+  font-weight: 400;
+  color: var(--semi-black);
+  text-align: justify;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Показывать до 4 строк */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  max-width: 100%;
+}
+
+.card-body .btn-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  min-width: 40px;
+}
+
+.card-body .btn-container .btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.card-bottom {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 20px;
+  justify-content: space-between;
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.card-bottom-left {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  color: var(--black);
+}
+
+.card-bottom-left > img {
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.card-bottom-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-bottom-right i {
+  margin-left: 4px;
+}
+
+.right-aside > a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.tags-list i {
+  position: relative;
+  top: 1px;
+}
+
+.sort-container li {
+  border-radius: 4px;
+  color: var(--semi-white);
+  background-color: var(--semi-black);
+}
+
+.sort-container li > a {
+  display: inline-block;
+  padding: 4px 8px 4px 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+h5 {
+  color: var(--black);
+  font-weight: 900;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.right-aside img {
+  border-radius: 4px;
+}
+
+ul {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 6px;
+}
+
+.tags-card:first-of-type ul li {
+  width: 100%;
+}
+
+.right-aside .tag {
+  font-size: 0.75rem;
+}
+
+.cardtag div {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.img-container > img {
+  width: 32px;
+  height: 32px;
+}
+
+/* Media Queries */
+@media only screen and (max-width: 580px) {
+  .main-wrapper .btn-container {
+    flex-flow: column nowrap;
+  }
+
+  .card-top {
+    flex-flow: column nowrap;
+  }
+
+  .main-wrapper .btn-container {
+    justify-content: center;
+    flex-flow: row wrap;
+    gap: 10px;
+  }
+}
+
+
+
+/* ----- ✅ Новое: Карточки фиксированной ширины и ограничения текста ----- */
+.cards {
+  width: 100%;
+  max-width: 900px;
+}
+
+.card-body {
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.card-info h3 a,
+.card-info p a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-info h3 a:hover {
+  text-decoration: underline;
+}
+
+.card-info p {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* Количество строк */
+  -webkit-box-orient: vertical;
+  white-space: normal;
+}
+
+/* ----- ✅ Новое: Отображение даты ----- */
+.card-bottom-left p.created-at {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--semi-black);
+  margin: 0;
+  padding-top: 2px;
+}
+
+/* ----- ✅ Новое: Стили тегов внизу карточки ----- */
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0 0 0;
+}
+
+.tags-row .tag {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.tags-row .tag:hover {
+  background-color: #d5d5d5;
+}
+
+/* ----- ✅ На мобильных: делаем теги не ломать верстку ----- */
+@media only screen and (max-width: 580px) {
+  .tags-row {
+    justify-content: flex-start;
+  }
+}
+
+.tag {
+  background-color: #0051ff;
+  color: white;
+  border-color: #003ecc;
+  box-shadow: 0 0 5px rgba(0, 81, 255, 0.5);
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.comment-card {
+  background-color: var(--white);
+  border: 2px solid var(--black);
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.comment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--semi-black);
+}
+
+.comment-post-title {
+  font-weight: 600;
+  color: var(--primary);
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.comment-date {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--semi-black);
+}
+
+.comment-content {
+  font-size: 1rem;
+  color: var(--black);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
