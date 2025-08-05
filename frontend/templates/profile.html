@@ -27,7 +27,11 @@
 
           <div class="profile-container">
             <div class="img-profile">
-              <img src="https://source.boringavatars.com/beam/120/{{.User.Username}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="{{.User.Username}}" />
+              <img
+                      src="/static/assets/images/user.png"
+                      alt="{{.User.Username}}"
+                      style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+              />
               <strong>{{.User.Username}}</strong>
               <span>Member since {{.User.CreatedAt.Format "Jan 2, 2006"}}</span>
             </div>
@@ -35,49 +39,81 @@
             <div class="horizontal-rule"></div>
 
             <div class="info-profile">
-              <a href="#posts" class="info-profile-box active">
+              <div class="info-profile-box active" data-target="posts">
                 <h6 id="created-posts">{{.Stats.PostCount}}</h6>
                 <span>Created Posts</span>
-              </a>
-              <a href="#liked" class="info-profile-box">
+              </div>
+              <div class="info-profile-box" data-target="liked">
                 <h6 id="liked-posts">{{.Stats.LikeCount}}</h6>
                 <span>Liked Posts</span>
-              </a>
-              <a href="#disliked" class="info-profile-box">
+              </div>
+              <div class="info-profile-box" data-target="disliked">
                 <h6 id="disliked-posts">{{.Stats.DislikeCount}}</h6>
                 <span>Disliked Posts</span>
-              </a>
-              <a href="#comments" class="info-profile-box">
+              </div>
+              <div class="info-profile-box" data-target="comments">
                 <h6 id="commented-posts">{{.Stats.CommentCount}}</h6>
                 <span>Comments</span>
-              </a>
+              </div>
             </div>
           </div>
 
           <section class="posts" id="posts">
             <h3>Posts by @{{.User.Username}}</h3>
-
-            {{if .Posts}}
-            {{range .Posts}}
-            <div class="post-card">
-              <img src="https://source.boringavatars.com/beam/40/{{.AuthorUsername}}?square&colors=7dc81b,8ACD4F,26E4B9,0051ff,47139A" alt="{{.AuthorUsername}}" />
-              <div class="post-card-info">
-                <h4><a href="/post/{{.ID}}">{{.Title}}</a></h4>
-<!--                <p>{{truncate .Content 200}}</p>-->
-                <div class="right">
-                  <a href="/post/{{.ID}}">
-                    <button class="btn btn-white">
-                      Continue Reading
-                      <i class="ri-arrow-drop-right-line"></i>
-                    </button>
-                  </a>
-                </div>
-              </div>
+            <div class="cards-list" >
+              {{if .Posts}}
+              {{range .Posts}}
+              {{ template "profile/post-section" . }}
+              {{end}}
+              {{else}}
+              <p class="no-posts">No posts yet.</p>
+              {{end}}
             </div>
-            {{end}}
-            {{else}}
-            <p class="no-posts">No posts yet.</p>
-            {{end}}
+          </section>
+
+          <section class="posts" id="liked">
+            <h3>Liked Posts</h3>
+            <div class="cards-list">
+              {{if .LikedPosts}}
+              {{range .LikedPosts}}
+              {{ template "profile/post-section" . }}
+              {{end}}
+              {{else}}
+              <p class="no-posts">No liked posts.</p>
+              {{end}}
+            </div>
+          </section>
+
+          <section class="posts" id="disliked">
+            <h3>Disliked Posts</h3>
+            <div class="cards-list">
+              {{if .DislikedPosts}}
+              {{range .DislikedPosts}}
+              {{ template "profile/post-section" . }}
+              {{end}}
+              {{else}}
+              <p class="no-posts">No disliked posts.</p>
+              {{end}}
+            </div>
+          </section>
+
+          <section class="posts" id="comments">
+            <h3>Comments</h3>
+            <div class="comments-list">
+              {{if .Comments}}
+              {{range .Comments}}
+              <div class="comment-card">
+                <div class="comment-header">
+                  <a href="/post/{{.PostID}}" class="comment-post-title">{{.PostTitle}}</a>
+                  <span class="comment-date">{{.CreatedAt.Format "Jan 2, 2006 at 15:04"}}</span>
+                </div>
+                <p class="comment-content">{{.Content}}</p>
+              </div>
+              {{end}}
+              {{else}}
+              <p class="no-posts">No comments yet.</p>
+              {{end}}
+            </div>
           </section>
         </div>
       </div>
