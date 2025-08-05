@@ -148,3 +148,29 @@ func (r *repository) GetReaction(commentID, userID uuid.UUID) (int, error) {
 
 	return reaction, nil
 }
+
+func (r repository) GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error) {
+	rows, err := r.db.Query(`
+		SELECT c.id, c.content, c.created_at, c.post_id, p.title
+		FROM comments c
+		JOIN posts p ON c.post_id = p.id
+		WHERE c.user_id = ?
+		ORDER BY c.created_at DESC`, userID.String())
+	if err != nil {
+		return nil, fmt.Errorf("GetCommentsByUserID query failed: %v", err)
+	}
+	defer rows.Close()
+
+	var comments []*domain.CommentWithPostTitle
+	for rows.Next() {
+		var c domain.CommentWithPostTitle
+		var idStr, postIDStr string
+		if err := rows.Scan(&idStr, &c.Content, &c.CreatedAt, &postIDStr, &c.PostTitle); err != nil {
+			return nil, fmt.Errorf("scan comment: %v", err)
+		}
+		c.ID, _ = uuid.Parse(idStr)
+		c.PostID, _ = uuid.Parse(postIDStr)
+		comments = append(comments, &c)
+	}
+	return comments, nil
+}

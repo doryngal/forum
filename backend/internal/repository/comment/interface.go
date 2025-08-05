@@ -12,4 +12,5 @@ type Repository interface {
 	Dislike(commentID, userID uuid.UUID) error
 	ExistsByID(id uuid.UUID) (bool, error)
 	GetReaction(commentID, userID uuid.UUID) (int, error)
+	GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error)
 }
