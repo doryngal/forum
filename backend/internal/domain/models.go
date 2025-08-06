@@ -63,6 +63,7 @@ type Comment struct {
 	AuthorUsername string    `json:"author_username"`
 	Likes          int       `json:"likes"`
 	Dislikes       int       `json:"dislikes"`
+	IsOwner        bool      `json:"is_owner"`
 }
 
 type PostReaction struct {
