@@ -47,19 +47,7 @@ func (h *DeleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.postService.DeletePost(postID, user.ID)
-	http.Redirect(w, r, "/profile/"+user.Username, http.StatusSeeOther)
-}
-
-func (h *EditHandler) getUserFromSession(r *http.Request) (*domain.User, error) {
-	cookie, err := r.Cookie("session_id")
-	if err != nil {
-		return nil, err
-	}
-	sess, err := h.sessionService.GetByToken(cookie.Value)
-	if err != nil {
-		return nil, err
-	}
-	return h.userService.GetUserByID(sess.UserID)
+	http.Redirect(w, r, "/profile/", http.StatusSeeOther)
 }
 
 func (h *DeleteHandler) getUserFromSession(r *http.Request) (*domain.User, error) {

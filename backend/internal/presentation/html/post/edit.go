@@ -109,3 +109,15 @@ func (h *EditHandler) handleEditPost(w http.ResponseWriter, r *http.Request, pos
 
 	http.Redirect(w, r, "/post/"+post.ID.String(), http.StatusSeeOther)
 }
+
+func (h *EditHandler) getUserFromSession(r *http.Request) (*domain.User, error) {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		return nil, err
+	}
+	sess, err := h.sessionService.GetByToken(cookie.Value)
+	if err != nil {
+		return nil, err
+	}
+	return h.userService.GetUserByID(sess.UserID)
+}
