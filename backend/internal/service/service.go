@@ -23,8 +23,7 @@ type Service struct {
 	User     user_service.Service
 }
 
-func NewServices(reps *repository.Repositories) *Service {
-	logger := logger.New()
+func NewServices(reps *repository.Repositories, logger logger.Logger) *Service {
 	return &Service{
 		Category: category_service.New(reps.Category, reps.Post, category_validator.NewCategoryValidator()),
 		Comment:  comment_service.New(reps.Comment, reps.Post, reps.User, comment_validator.NewCommentValidator()),
