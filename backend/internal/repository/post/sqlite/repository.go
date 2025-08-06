@@ -157,11 +157,66 @@ func (r repository) Update(post *domain.Post) error {
 }
 
 func (r repository) Delete(postID uuid.UUID, userID uuid.UUID) error {
-	_, err := r.db.Exec(`
-		DELETE FROM posts WHERE id = $1 AND user_id = $2`, postID, userID)
+	tx, err := r.db.Begin()
 	if err != nil {
-		return fmt.Errorf("%w: %v", post_repo.ErrQueryFailed, err)
+		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		}
+	}()
+
+	_, err = tx.Exec(`
+		DELETE FROM comment_reactions 
+		WHERE comment_id IN (SELECT id FROM comments WHERE post_id = $1)
+	`, postID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete comment_reactions: %w", err)
+	}
+
+	_, err = tx.Exec(`DELETE FROM comments WHERE post_id = $1`, postID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete comments: %w", err)
+	}
+
+	_, err = tx.Exec(`DELETE FROM post_reactions WHERE post_id = $1`, postID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete post_reactions: %w", err)
+	}
+
+	_, err = tx.Exec(`DELETE FROM post_categories WHERE post_id = $1`, postID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete post_categories: %w", err)
+	}
+
+	res, err := tx.Exec(`DELETE FROM posts WHERE id = $1 AND user_id = $2`, postID, userID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete post: %w", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		tx.Rollback()
+		return fmt.Errorf("no post deleted, might not exist or not owned by user")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 	return nil
 }
 
