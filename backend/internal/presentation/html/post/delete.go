@@ -2,6 +2,7 @@ package post
 
 import (
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
@@ -15,15 +16,16 @@ type DeleteHandler struct {
 	postService    post.Service
 	sessionService session.Service
 	userService    user.Service
+	errorHandler   errorhandler.Handler
 }
 
-func NewDeleteHandler(ps post.Service, ss session.Service, us user.Service) *DeleteHandler {
-	return &DeleteHandler{ps, ss, us}
+func NewDeleteHandler(ps post.Service, ss session.Service, us user.Service, errorHandler errorhandler.Handler) *DeleteHandler {
+	return &DeleteHandler{ps, ss, us, errorHandler}
 }
 
 func (h *DeleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method Not Allowed", nil, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -42,7 +44,7 @@ func (h *DeleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	p, err := h.postService.GetPostByID(postID)
 	if err != nil || p.UserID != user.ID {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		h.errorHandler.HandleError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 

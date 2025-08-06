@@ -3,6 +3,7 @@ package post
 import (
 	"errors"
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/category"
 	"forum/internal/service/comment"
 	"forum/internal/service/post"
@@ -23,9 +24,10 @@ type PostHandler struct {
 	commentService  comment.Service
 	sessionService  session.Service
 	categoryService category.Service
+	errorHandler    errorhandler.Handler
 }
 
-func NewPostHandler(tmpl *template.Template, us user.Service, ps post.Service, cs comment.Service, ss session.Service, cts category.Service) *PostHandler {
+func NewPostHandler(tmpl *template.Template, us user.Service, ps post.Service, cs comment.Service, ss session.Service, cts category.Service, errorHandler errorhandler.Handler) *PostHandler {
 	return &PostHandler{
 		tmpl:            tmpl,
 		userService:     us,
@@ -33,6 +35,7 @@ func NewPostHandler(tmpl *template.Template, us user.Service, ps post.Service, c
 		commentService:  cs,
 		sessionService:  ss,
 		categoryService: cts,
+		errorHandler:    errorHandler,
 	}
 }
 
@@ -40,7 +43,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	postIDStr := strings.TrimPrefix(r.URL.Path, "/post/")
 	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Invalid post ID", err, http.StatusBadRequest)
 		return
 	}
 
@@ -50,7 +53,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handlePostAction(w, r, postID)
 	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method Not Allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -64,15 +67,17 @@ type PostData struct {
 }
 
 func (h *PostHandler) handleGetPost(w http.ResponseWriter, r *http.Request, postID uuid.UUID) {
+	userID, err := h.getUserIDFromSession(r)
+
 	post, err := h.postService.GetPostByID(postID)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	comments, err := h.commentService.GetCommentsByPost(postID)
+	comments, err := h.commentService.GetCommentsByPost(postID, userID)
 	if err != nil {
-		http.Error(w, "Failed to load comments", http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Failed to load comments", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -103,7 +108,7 @@ func (h *PostHandler) handleGetPost(w http.ResponseWriter, r *http.Request, post
 
 func (h *PostHandler) handlePostAction(w http.ResponseWriter, r *http.Request, postID uuid.UUID) {
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Invalid form data", err, http.StatusBadRequest)
 		return
 	}
 
@@ -125,7 +130,7 @@ func (h *PostHandler) handlePostAction(w http.ResponseWriter, r *http.Request, p
 		commentIDStr := r.FormValue("comment_id")
 		commentID, err := uuid.Parse(commentIDStr)
 		if err != nil {
-			http.Error(w, "Invalid comment ID", http.StatusBadRequest)
+			h.errorHandler.HandleError(w, "Invalid comment ID", err, http.StatusBadRequest)
 			return
 		}
 		err = h.commentService.LikeComment(commentID, userID)
@@ -134,17 +139,17 @@ func (h *PostHandler) handlePostAction(w http.ResponseWriter, r *http.Request, p
 		commentIDStr := r.FormValue("comment_id")
 		commentID, err := uuid.Parse(commentIDStr)
 		if err != nil {
-			http.Error(w, "Invalid comment ID", http.StatusBadRequest)
+			h.errorHandler.HandleError(w, "Invalid comment ID", err, http.StatusBadRequest)
 			return
 		}
 		err = h.commentService.DislikeComment(commentID, userID)
 	default:
-		http.Error(w, "Unknown action", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Unknown action", err, http.StatusBadRequest)
 		return
 	}
 
 	if err != nil {
-		http.Error(w, "Action failed: "+err.Error(), http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Action failed", err, http.StatusInternalServerError)
 		return
 	}
 

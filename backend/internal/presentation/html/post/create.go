@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/category"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
@@ -21,15 +22,17 @@ type CreateHandler struct {
 	postService     post.Service
 	sessionService  session.Service
 	categoryService category.Service
+	errorHandler    errorhandler.Handler
 }
 
-func NewCreateHandler(tmpl *template.Template, userService user.Service, postService post.Service, sessionService session.Service, categoryService category.Service) *CreateHandler {
+func NewCreateHandler(tmpl *template.Template, userService user.Service, postService post.Service, sessionService session.Service, categoryService category.Service, errorHandler errorhandler.Handler) *CreateHandler {
 	return &CreateHandler{
 		tmpl:            tmpl,
 		userService:     userService,
 		postService:     postService,
 		sessionService:  sessionService,
 		categoryService: categoryService,
+		errorHandler:    errorHandler,
 	}
 }
 
@@ -40,7 +43,7 @@ func (h *CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handleCreatePost(w, r)
 	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method Not Allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 

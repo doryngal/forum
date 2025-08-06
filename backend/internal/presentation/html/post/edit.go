@@ -2,6 +2,7 @@ package post
 
 import (
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/category"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
@@ -19,10 +20,11 @@ type EditHandler struct {
 	userService     user.Service
 	sessionService  session.Service
 	categoryService category.Service
+	errorHandler    errorhandler.Handler
 }
 
-func NewEditHandler(t *template.Template, ps post.Service, us user.Service, ss session.Service, cs category.Service) *EditHandler {
-	return &EditHandler{t, ps, us, ss, cs}
+func NewEditHandler(t *template.Template, ps post.Service, us user.Service, ss session.Service, cs category.Service, errorHandler errorhandler.Handler) *EditHandler {
+	return &EditHandler{t, ps, us, ss, cs, errorHandler}
 }
 
 func (h *EditHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +43,7 @@ func (h *EditHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	savedPost, err := h.postService.GetPostByID(postID)
 	if err != nil || savedPost.UserID != user.ID {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		h.errorHandler.HandleError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -51,7 +53,7 @@ func (h *EditHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handleEditPost(w, r, savedPost)
 	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method Not Allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 
