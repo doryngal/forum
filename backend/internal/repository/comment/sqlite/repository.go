@@ -31,7 +31,7 @@ func (r repository) Create(comment *domain.Comment) error {
 	return nil
 }
 
-func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
+func (r repository) GetByPostID(postID, userID uuid.UUID) ([]*domain.Comment, error) {
 	rows, err := r.db.Query(`
 		SELECT c.id, c.post_id, c.user_id, c.content, c.created_at, 
 		       u.username,
@@ -68,6 +68,7 @@ func (r repository) GetByPostID(postID uuid.UUID) ([]*domain.Comment, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", comment_repo.ErrUUIDParseFailed, err)
 		}
+		c.IsOwner = c.UserID == userID
 		comments = append(comments, &c)
 	}
 	return comments, nil
