@@ -2,6 +2,7 @@ package profile
 
 import (
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/comment"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
@@ -18,6 +19,7 @@ type ProfileHandler struct {
 	postService    post.Service
 	commentService comment.Service
 	sessionService session.Service
+	errorHandler   errorhandler.Handler
 }
 
 func NewProfileHandler(
@@ -26,6 +28,7 @@ func NewProfileHandler(
 	postService post.Service,
 	commentService comment.Service,
 	sessionService session.Service,
+	errorHandler errorhandler.Handler,
 ) *ProfileHandler {
 	return &ProfileHandler{
 		tmpl:           tmpl,
@@ -33,6 +36,7 @@ func NewProfileHandler(
 		postService:    postService,
 		commentService: commentService,
 		sessionService: sessionService,
+		errorHandler:   errorHandler,
 	}
 }
 
@@ -58,7 +62,7 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handleAction(w, r)
 	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -77,7 +81,7 @@ func (h *ProfileHandler) handleOwnProfile(w http.ResponseWriter, r *http.Request
 
 	user, err := h.userService.GetUserByID(session.UserID)
 	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+		h.errorHandler.HandleError(w, "User not found", err, http.StatusNotFound)
 		return
 	}
 
@@ -86,7 +90,7 @@ func (h *ProfileHandler) handleOwnProfile(w http.ResponseWriter, r *http.Request
 
 func (h *ProfileHandler) handleAction(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Invalid form data", err, http.StatusBadRequest)
 		return
 	}
 
@@ -100,7 +104,7 @@ func (h *ProfileHandler) handleAction(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.FormValue("post_id")
 	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Invalid post ID", err, http.StatusBadRequest)
 		return
 	}
 
@@ -110,12 +114,12 @@ func (h *ProfileHandler) handleAction(w http.ResponseWriter, r *http.Request) {
 	case "dislike":
 		err = h.postService.DislikePost(postID, userID)
 	default:
-		http.Error(w, "Unknown action", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Unknown action", err, http.StatusBadRequest)
 		return
 	}
 
 	if err != nil {
-		http.Error(w, "Action failed: "+err.Error(), http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Action failed", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -160,7 +164,7 @@ func (h *ProfileHandler) renderProfilePage(w http.ResponseWriter, user *domain.U
 func (h *ProfileHandler) handleGetProfile(w http.ResponseWriter, r *http.Request, username string) {
 	user, err := h.userService.GetUserByUsername(username)
 	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+		h.errorHandler.HandleError(w, "User not found", err, http.StatusNotFound)
 		return
 	}
 
