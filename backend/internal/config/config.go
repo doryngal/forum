@@ -17,6 +17,8 @@ type ServerConfig struct {
 	WriteTimeout time.Duration
 	StaticDir    string
 	TemplateDir  string
+	StaticPath   string
+	TemplatePath string
 }
 
 type DatabaseConfig struct {
@@ -39,6 +41,8 @@ func LoadConfig() Config {
 			WriteTimeout: 10 * time.Second,
 			StaticDir:    getEnv("STATIC_DIR", "./web/static"),
 			TemplateDir:  getEnv("TEMPLATE_DIR", "./web/templates"),
+			StaticPath:   getEnv("STATIC_PATH", "./../frontend/static"),
+			TemplatePath: getEnv("TEMPLATE_PATH", "./../frontend/templates"),
 		},
 		Database: DatabaseConfig{
 			Driver: getEnv("DATABASE_DRIVER", "sqlite3"),
