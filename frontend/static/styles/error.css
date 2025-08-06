@@ -1,0 +1,78 @@
+:root {
+    --primary: #7dc81b;
+    --secondary: #0051ff;
+    --black: #080705;
+    --white: #f7e9e4;
+    --semi-black: #1f2225;
+    --semi-white: rgb(218, 203, 203);
+    --paragraph: rgba(247, 233, 228, 0.75);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--white);
+    color: var(--black);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-error {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-box {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 81, 255, 0.15);
+    border: 1px solid var(--semi-white);
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 20px;
+}
+
+.error-msg {
+    font-size: 1.5rem;
+    color: var(--semi-black);
+    margin-bottom: 30px;
+}
+
+/* Кнопка */
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    text-decoration: none;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: var(--secondary);
+    color: var(--white);
+}
