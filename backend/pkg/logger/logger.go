@@ -22,6 +22,7 @@ type Logger interface {
 	Info(msg string, fields ...Field)
 	Warn(msg string, fields ...Field)
 	Error(msg string, fields ...Field)
+	Errorf(format string, args ...interface{})
 	With(fields ...Field) Logger
 }
 
@@ -66,6 +67,11 @@ func (l *stdLogger) Warn(msg string, fields ...Field) {
 
 func (l *stdLogger) Error(msg string, fields ...Field) {
 	l.log(LevelError, msg, fields...)
+}
+
+func (l *stdLogger) Errorf(format string, args ...interface{}) {
+	formatted := fmt.Sprintf(format, args...)
+	l.log(LevelError, formatted)
 }
 
 func (l *stdLogger) log(level Level, msg string, fields ...Field) {
