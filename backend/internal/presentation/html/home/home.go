@@ -2,13 +2,13 @@ package home
 
 import (
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/category"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"github.com/google/uuid"
 	"html/template"
-	"log"
 	"net/http"
 )
 
@@ -18,15 +18,17 @@ type Handler struct {
 	userService     user.Service
 	categoryService category.Service
 	sessionService  session.Service
+	errorHandler    errorhandler.Handler
 }
 
-func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service, ss session.Service) *Handler {
+func NewHomeHandler(tmpl *template.Template, ps post.Service, us user.Service, cs category.Service, ss session.Service, errorHandler errorhandler.Handler) *Handler {
 	return &Handler{
 		tmpl:            tmpl,
 		postService:     ps,
 		userService:     us,
 		categoryService: cs,
 		sessionService:  ss,
+		errorHandler:    errorHandler,
 	}
 }
 
@@ -42,7 +44,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handleAction(w, r)
 	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method Not Allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -59,7 +61,7 @@ func (h *Handler) handleHome(w http.ResponseWriter, r *http.Request) {
 
 	posts, err := h.postService.GetAllPosts()
 	if err != nil {
-		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Failed to fetch posts", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -79,14 +81,13 @@ func (h *Handler) handleHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.tmpl.ExecuteTemplate(w, "home.html", data); err != nil {
-		log.Printf("template error: %v", err)
-		http.Error(w, "Template rendering failed", http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Template rendering failed", err, http.StatusInternalServerError)
 	}
 }
 
 func (h *Handler) handleAction(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Invalid form data", err, http.StatusBadRequest)
 		return
 	}
 
@@ -100,7 +101,7 @@ func (h *Handler) handleAction(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.FormValue("post_id")
 	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Invalid post ID", err, http.StatusBadRequest)
 		return
 	}
 
@@ -110,12 +111,12 @@ func (h *Handler) handleAction(w http.ResponseWriter, r *http.Request) {
 	case "dislike":
 		err = h.postService.DislikePost(postID, userID)
 	default:
-		http.Error(w, "Unknown action", http.StatusBadRequest)
+		h.errorHandler.HandleError(w, "Unknown action", nil, http.StatusBadRequest)
 		return
 	}
 
 	if err != nil {
-		http.Error(w, "Action failed: "+err.Error(), http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Action failed", err, http.StatusInternalServerError)
 		return
 	}
 
