@@ -48,7 +48,7 @@ func (s *service) CreateComment(comment *domain.Comment) error {
 	return s.repo.Create(comment)
 }
 
-func (s *service) GetCommentsByPost(postID uuid.UUID) ([]*domain.Comment, error) {
+func (s *service) GetCommentsByPost(postID, userID uuid.UUID) ([]*domain.Comment, error) {
 	if postID == uuid.Nil {
 		return nil, post.ErrInvalidPost
 	}
@@ -57,7 +57,7 @@ func (s *service) GetCommentsByPost(postID uuid.UUID) ([]*domain.Comment, error)
 		return nil, post.ErrPostNotFound
 	}
 
-	return s.repo.GetByPostID(postID)
+	return s.repo.GetByPostID(postID, userID)
 }
 
 func (s *service) LikeComment(commentID, userID uuid.UUID) error {
