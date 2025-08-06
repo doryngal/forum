@@ -2,6 +2,7 @@ package auth
 
 import (
 	"forum/internal/domain"
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/user"
 	"html/template"
 	"net/http"
@@ -9,14 +10,16 @@ import (
 )
 
 type RegisterHandler struct {
-	tmpl        *template.Template
-	userService user.Service
+	tmpl         *template.Template
+	userService  user.Service
+	errorHandler errorhandler.Handler
 }
 
-func NewRegisterHandler(tmpl *template.Template, us user.Service) *RegisterHandler {
+func NewRegisterHandler(tmpl *template.Template, us user.Service, errorHandler errorhandler.Handler) *RegisterHandler {
 	return &RegisterHandler{
-		tmpl:        tmpl,
-		userService: us,
+		tmpl:         tmpl,
+		userService:  us,
+		errorHandler: errorHandler,
 	}
 }
 
@@ -27,7 +30,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handleRegister(w, r)
 	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -43,7 +46,7 @@ func (h *RegisterHandler) renderRegisterForm(w http.ResponseWriter, data *Regist
 	}
 	err := h.tmpl.ExecuteTemplate(w, "register.html", data)
 	if err != nil {
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Error rendering template", err, http.StatusInternalServerError)
 	}
 }
 

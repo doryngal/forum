@@ -1,10 +1,10 @@
 package auth
 
 import (
+	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"html/template"
-	"log"
 	"net/http"
 )
 
@@ -12,13 +12,15 @@ type LoginHandler struct {
 	tmpl           *template.Template
 	userService    user.Service
 	sessionService session.Service
+	errorHandler   errorhandler.Handler
 }
 
-func NewLoginHandler(tmpl *template.Template, userService user.Service, sessionService session.Service) *LoginHandler {
+func NewLoginHandler(tmpl *template.Template, userService user.Service, sessionService session.Service, errorHandler errorhandler.Handler) *LoginHandler {
 	return &LoginHandler{
 		tmpl:           tmpl,
 		userService:    userService,
 		sessionService: sessionService,
+		errorHandler:   errorHandler,
 	}
 }
 
@@ -29,7 +31,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		h.handleLogin(w, r)
 	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.errorHandler.HandleError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -39,8 +41,7 @@ func (h *LoginHandler) renderLogin(w http.ResponseWriter, data *TemplateData) {
 	}
 
 	if err := h.tmpl.ExecuteTemplate(w, "login.html", data); err != nil {
-		log.Printf("Template error: %v", err)
-		http.Error(w, "Failed to render login page", http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Failed to render login page", err, http.StatusInternalServerError)
 	}
 }
 
@@ -64,7 +65,7 @@ func (h *LoginHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	// Create session
 	session, err := h.sessionService.Create(user.ID)
 	if err != nil {
-		http.Error(w, "Failed to create session: "+err.Error(), http.StatusInternalServerError)
+		h.errorHandler.HandleError(w, "Failed to create session", err, http.StatusInternalServerError)
 		return
 	}
 
