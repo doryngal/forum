@@ -135,12 +135,8 @@ func (s *service) GetUserByUsername(username string) (*domain.User, error) {
 
 	user, err := s.repo.FindByUsername(username)
 	if err != nil {
-		if errors.Is(err, user2.ErrQueryFailed) {
-			s.log.Info("User not found by username", logger.F("username", username))
-			return nil, ErrUserNotFound
-		}
-		s.log.Error("GetUserByUsername failed", logger.F("error", err))
-		return nil, err
+		s.log.Info("User not found by username", logger.F("username", username))
+		return nil, ErrUserNotFound
 	}
 	return user, nil
 }
