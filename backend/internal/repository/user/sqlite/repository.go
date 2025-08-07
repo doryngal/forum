@@ -17,7 +17,7 @@ func New(db *sql.DB) user_repo.Repository {
 	return &repository{db: db}
 }
 
-func (r repository) Create(user *domain.User) error {
+func (r *repository) Create(user *domain.User) error {
 	user.ID = uuid.New()
 	user.CreatedAt = time.Now()
 
@@ -31,7 +31,7 @@ func (r repository) Create(user *domain.User) error {
 	return nil
 }
 
-func (r repository) FindByEmailORUsername(emailOrUsername string) (*domain.User, error) {
+func (r *repository) FindByEmailORUsername(emailOrUsername string) (*domain.User, error) {
 	var u domain.User
 	var idStr string
 
@@ -57,7 +57,7 @@ func (r repository) FindByEmailORUsername(emailOrUsername string) (*domain.User,
 	return &u, nil
 }
 
-func (r repository) FindByEmail(email string) (*domain.User, error) {
+func (r *repository) FindByEmail(email string) (*domain.User, error) {
 	var u domain.User
 	var idStr string
 
@@ -81,7 +81,7 @@ func (r repository) FindByEmail(email string) (*domain.User, error) {
 	return &u, nil
 }
 
-func (r repository) FindByID(id uuid.UUID) (*domain.User, error) {
+func (r *repository) FindByID(id uuid.UUID) (*domain.User, error) {
 	var u domain.User
 	var idStr string
 
@@ -105,7 +105,7 @@ func (r repository) FindByID(id uuid.UUID) (*domain.User, error) {
 	return &u, nil
 }
 
-func (r repository) IsEmailTaken(email string) (bool, error) {
+func (r *repository) IsEmailTaken(email string) (bool, error) {
 	var exists bool
 
 	err := r.db.QueryRow(
