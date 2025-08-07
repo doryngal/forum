@@ -22,8 +22,9 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	Driver string
-	Path   string
+	Driver   string
+	Path     string
+	Provider string
 }
 
 type SessionConfig struct {
@@ -45,8 +46,9 @@ func LoadConfig() Config {
 			TemplatePath: getEnv("TEMPLATE_PATH", "./../frontend/templates"),
 		},
 		Database: DatabaseConfig{
-			Driver: getEnv("DATABASE_DRIVER", "sqlite3"),
-			Path:   getEnv("DB_PATH", "./../backend/forum.db"),
+			Driver:   getEnv("DATABASE_DRIVER", "sqlite3"),
+			Path:     getEnv("DB_PATH", "./../backend/forum.db"),
+			Provider: getEnv("PROVIDER", "sqlite"),
 		},
 		Session: SessionConfig{
 			CookieName:     getEnv("COOKIE_NAME", "session_id"),

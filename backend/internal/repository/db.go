@@ -3,15 +3,15 @@ package repository
 import (
 	"database/sql"
 	category_repo "forum/internal/repository/category"
-	category_sqlite "forum/internal/repository/category/sqlite"
+	sqlite_category "forum/internal/repository/category/sqlite"
 	comment_repo "forum/internal/repository/comment"
-	comment_sqlite "forum/internal/repository/comment/sqlite"
+	sqlite_comment "forum/internal/repository/comment/sqlite"
 	post_repo "forum/internal/repository/post"
-	post_sqlite "forum/internal/repository/post/sqlite"
+	sqlite_post "forum/internal/repository/post/sqlite"
 	session_repo "forum/internal/repository/session"
-	session_sqlite "forum/internal/repository/session/sqlite"
+	sqlite_session "forum/internal/repository/session/sqlite"
 	user_repo "forum/internal/repository/user"
-	user_sqlite "forum/internal/repository/user/sqlite"
+	sqlite_user "forum/internal/repository/user/sqlite"
 )
 
 type Repositories struct {
@@ -22,12 +22,17 @@ type Repositories struct {
 	User     user_repo.Repository
 }
 
-func NewRepositories(db *sql.DB) *Repositories {
-	return &Repositories{
-		Category: category_sqlite.New(db),
-		Comment:  comment_sqlite.New(db),
-		Session:  session_sqlite.New(db),
-		Post:     post_sqlite.New(db),
-		User:     user_sqlite.New(db),
+func NewRepositories(db *sql.DB, provider string) *Repositories {
+	switch provider {
+	case "sqlite":
+		return &Repositories{
+			Category: sqlite_category.New(db),
+			Comment:  sqlite_comment.New(db),
+			Session:  sqlite_session.New(db),
+			Post:     sqlite_post.New(db),
+			User:     sqlite_user.New(db),
+		}
+	default:
+		panic("unknown provider")
 	}
 }

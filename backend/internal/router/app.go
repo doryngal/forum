@@ -25,7 +25,7 @@ func NewApp(cfg config.Config) (http.Handler, error) {
 		return nil, fmt.Errorf("init templates: %w", err)
 	}
 
-	repos := repository.NewRepositories(db.GetDB())
+	repos := repository.NewRepositories(db.GetDB(), cfg.Database.Provider)
 	services := service.NewServices(repos, log)
 	handlers := html.NewTemplateHandlers(tmpl, services, log)
 
