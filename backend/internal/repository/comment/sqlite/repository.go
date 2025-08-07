@@ -17,7 +17,7 @@ func New(db *sql.DB) comment_repo.Repository {
 	return &repository{db: db}
 }
 
-func (r repository) Create(comment *domain.Comment) error {
+func (r *repository) Create(comment *domain.Comment) error {
 	comment.ID = uuid.New()
 	comment.CreatedAt = time.Now()
 
@@ -31,7 +31,7 @@ func (r repository) Create(comment *domain.Comment) error {
 	return nil
 }
 
-func (r repository) GetByPostID(postID, userID uuid.UUID) ([]*domain.Comment, error) {
+func (r *repository) GetByPostID(postID, userID uuid.UUID) ([]*domain.Comment, error) {
 	rows, err := r.db.Query(`
 		SELECT c.id, c.post_id, c.user_id, c.content, c.created_at, 
 		       u.username,
@@ -74,56 +74,43 @@ func (r repository) GetByPostID(postID, userID uuid.UUID) ([]*domain.Comment, er
 	return comments, nil
 }
 
-func (r repository) Like(commentID, userID uuid.UUID) error {
+func (r *repository) Like(commentID, userID uuid.UUID) error {
 	return r.setReaction(commentID, userID, 1)
 }
 
-func (r repository) Dislike(commentID, userID uuid.UUID) error {
+func (r *repository) Dislike(commentID, userID uuid.UUID) error {
 	return r.setReaction(commentID, userID, -1)
 }
 
-func (r repository) setReaction(commentID, userID uuid.UUID, reaction int) error {
-	var existingReaction int
-	err := r.db.QueryRow(`
+func (r *repository) setReaction(commentID, userID uuid.UUID, reaction int) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	var current int
+	err = tx.QueryRow(`
 		SELECT reaction FROM comment_reactions 
-		WHERE user_id = ? AND comment_id = ?`,
-		userID.String(), commentID.String(),
-	).Scan(&existingReaction)
+		WHERE comment_id = ? AND user_id = ?`,
+		commentID.String(), userID.String(),
+	).Scan(&current)
 
-	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("%w: %v", comment_repo.ErrReactionUpdateFailed, err)
+	switch {
+	case err == sql.ErrNoRows:
+		_, err = tx.Exec(`INSERT INTO comment_reactions (user_id, comment_id, reaction) VALUES (?, ?, ?)`,
+			userID.String(), commentID.String(), reaction)
+	case err == nil && current == reaction:
+		_, err = tx.Exec(`DELETE FROM comment_reactions WHERE comment_id = ? AND user_id = ?`,
+			commentID.String(), userID.String())
+	case err == nil:
+		_, err = tx.Exec(`UPDATE comment_reactions SET reaction = ? WHERE comment_id = ? AND user_id = ?`,
+			reaction, commentID.String(), userID.String())
 	}
-
-	if err == nil {
-		if existingReaction == reaction {
-			_, err := r.db.Exec(`
-				DELETE FROM comment_reactions 
-				WHERE user_id = ? AND comment_id = ?`,
-				userID.String(), commentID.String())
-			if err != nil {
-				return fmt.Errorf("%w: %v", comment_repo.ErrReactionUpdateFailed, err)
-			}
-			return nil
-		}
-		_, err := r.db.Exec(`
-			UPDATE comment_reactions 
-			SET reaction = ? 
-			WHERE user_id = ? AND comment_id = ?`,
-			reaction, userID.String(), commentID.String())
-		if err != nil {
-			return fmt.Errorf("%w: %v", comment_repo.ErrReactionUpdateFailed, err)
-		}
-		return nil
-	}
-
-	_, err = r.db.Exec(`
-		INSERT INTO comment_reactions (user_id, comment_id, reaction) 
-		VALUES (?, ?, ?)`,
-		userID.String(), commentID.String(), reaction)
 	if err != nil {
 		return fmt.Errorf("%w: %v", comment_repo.ErrReactionUpdateFailed, err)
 	}
-	return nil
+	return tx.Commit()
 }
 
 func (r *repository) ExistsByID(id uuid.UUID) (bool, error) {
@@ -150,7 +137,7 @@ func (r *repository) GetReaction(commentID, userID uuid.UUID) (int, error) {
 	return reaction, nil
 }
 
-func (r repository) GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error) {
+func (r *repository) GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error) {
 	rows, err := r.db.Query(`
 		SELECT c.id, c.content, c.created_at, c.post_id, p.title
 		FROM comments c
@@ -169,8 +156,14 @@ func (r repository) GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWith
 		if err := rows.Scan(&idStr, &c.Content, &c.CreatedAt, &postIDStr, &c.PostTitle); err != nil {
 			return nil, fmt.Errorf("scan comment: %v", err)
 		}
-		c.ID, _ = uuid.Parse(idStr)
-		c.PostID, _ = uuid.Parse(postIDStr)
+		c.ID, err = uuid.Parse(idStr)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %v", comment_repo.ErrUUIDParseFailed, err)
+		}
+		c.PostID, err = uuid.Parse(postIDStr)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %v", comment_repo.ErrUUIDParseFailed, err)
+		}
 		comments = append(comments, &c)
 	}
 	return comments, nil

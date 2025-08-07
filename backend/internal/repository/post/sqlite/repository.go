@@ -17,7 +17,7 @@ func New(db *sql.DB) post_repo.Repository {
 	return &repository{db: db}
 }
 
-func (r repository) Create(post *domain.Post) error {
+func (r *repository) Create(post *domain.Post) error {
 	post.ID = uuid.New()
 	post.CreatedAt = time.Now()
 	_, err := r.db.Exec(
@@ -30,7 +30,7 @@ func (r repository) Create(post *domain.Post) error {
 	return nil
 }
 
-func (r repository) GetByID(id uuid.UUID) (*domain.Post, error) {
+func (r *repository) GetByID(id uuid.UUID) (*domain.Post, error) {
 	var p domain.Post
 	var idStr, userIDStr string
 	err := r.db.QueryRow(`
@@ -71,7 +71,7 @@ func (r repository) GetByID(id uuid.UUID) (*domain.Post, error) {
 	return &p, nil
 }
 
-func (r repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, error) {
+func (r *repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, error) {
 	rows, err := r.db.Query(`
 		SELECT c.id, c.name 
 		FROM categories c
@@ -98,7 +98,7 @@ func (r repository) getPostCategories(postID uuid.UUID) ([]*domain.Category, err
 	return categories, nil
 }
 
-func (r repository) GetAll() ([]*domain.Post, error) {
+func (r *repository) GetAll() ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at, 
 		       u.username, 
@@ -146,7 +146,7 @@ func (r repository) GetAll() ([]*domain.Post, error) {
 	return posts, nil
 }
 
-func (r repository) Update(post *domain.Post) error {
+func (r *repository) Update(post *domain.Post) error {
 	_, err := r.db.Exec(`
 		UPDATE posts SET title = $1, content = $2 WHERE id = $3 AND user_id = $4`,
 		post.Title, post.Content, post.ID, post.UserID)
@@ -156,7 +156,7 @@ func (r repository) Update(post *domain.Post) error {
 	return nil
 }
 
-func (r repository) Delete(postID uuid.UUID, userID uuid.UUID) error {
+func (r *repository) Delete(postID uuid.UUID, userID uuid.UUID) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
@@ -172,7 +172,7 @@ func (r repository) Delete(postID uuid.UUID, userID uuid.UUID) error {
 	_, err = tx.Exec(`
 		DELETE FROM comment_reactions 
 		WHERE comment_id IN (SELECT id FROM comments WHERE post_id = $1)
-	`, postID)
+	`, postID.String())
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to delete comment_reactions: %w", err)
@@ -220,7 +220,7 @@ func (r repository) Delete(postID uuid.UUID, userID uuid.UUID) error {
 	return nil
 }
 
-func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) {
+func (r *repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at, 
 		       u.username, 
@@ -270,7 +270,7 @@ func (r repository) GetByCategory(categoryID uuid.UUID) ([]*domain.Post, error) 
 	return posts, nil
 }
 
-func (r repository) GetByUserID(userID, sessionID uuid.UUID) ([]*domain.Post, error) {
+func (r *repository) GetByUserID(userID, sessionID uuid.UUID) ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at, 
 		       u.username, 
@@ -320,7 +320,7 @@ func (r repository) GetByUserID(userID, sessionID uuid.UUID) ([]*domain.Post, er
 	return posts, nil
 }
 
-func (r repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
+func (r *repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at, 
 		       u.username, 
@@ -369,15 +369,15 @@ func (r repository) GetLikedByUser(userID uuid.UUID) ([]*domain.Post, error) {
 	return posts, nil
 }
 
-func (r repository) Like(postID, userID uuid.UUID) error {
+func (r *repository) Like(postID, userID uuid.UUID) error {
 	return r.setReaction(postID, userID, 1)
 }
 
-func (r repository) Dislike(postID, userID uuid.UUID) error {
+func (r *repository) Dislike(postID, userID uuid.UUID) error {
 	return r.setReaction(postID, userID, -1)
 }
 
-func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
+func (r *repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 	var existingReaction int
 	err := r.db.QueryRow(`
 		SELECT reaction FROM post_reactions 
@@ -425,14 +425,14 @@ func (r repository) setReaction(postID, userID uuid.UUID, reaction int) error {
 	return nil
 }
 
-func (r repository) ExistsByID(postID uuid.UUID) (bool, error) {
+func (r *repository) ExistsByID(postID uuid.UUID) (bool, error) {
 	var exists bool
 	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM posts WHERE id = ?)",
 		postID.String()).Scan(&exists)
 	return exists, err
 }
 
-func (r repository) GetReaction(postID, userID uuid.UUID) (int, error) {
+func (r *repository) GetReaction(postID, userID uuid.UUID) (int, error) {
 	var reaction int
 	err := r.db.QueryRow(
 		"SELECT reaction FROM post_reactions WHERE post_id = ? AND user_id = ?",
@@ -449,7 +449,7 @@ func (r repository) GetReaction(postID, userID uuid.UUID) (int, error) {
 	return reaction, nil
 }
 
-func (r repository) GetLikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, error) {
+func (r *repository) GetLikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at,
 		       u.username,
@@ -470,7 +470,7 @@ func (r repository) GetLikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, err
 	return r.scanPosts(rows)
 }
 
-func (r repository) GetDislikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, error) {
+func (r *repository) GetDislikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, error) {
 	rows, err := r.db.Query(`
 		SELECT p.id, p.user_id, p.title, p.content, p.created_at,
 		       u.username,
@@ -491,7 +491,7 @@ func (r repository) GetDislikedPostsByUserID(userID uuid.UUID) ([]*domain.Post, 
 	return r.scanPosts(rows)
 }
 
-func (r repository) scanPosts(rows *sql.Rows) ([]*domain.Post, error) {
+func (r *repository) scanPosts(rows *sql.Rows) ([]*domain.Post, error) {
 	var posts []*domain.Post
 	for rows.Next() {
 		var p domain.Post
