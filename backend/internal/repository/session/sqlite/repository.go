@@ -20,7 +20,7 @@ func New(db *sql.DB) session_repo.Repository {
 
 func (r *repository) Create(session *domain.Session) error {
 	query := `INSERT INTO sessions (id, user_id, expires_at) VALUES ($1, $2, $3)`
-	_, err := r.db.Exec(query, session.ID, session.UserID, session.ExpiresAt)
+	_, err := r.db.Exec(query, session.ID, session.UserID.String(), session.ExpiresAt)
 	if err != nil {
 		return errors.Join(session_repo.ErrCreateSession, err)
 	}
@@ -49,7 +49,7 @@ func (r *repository) GetByToken(token string) (*domain.Session, error) {
 
 func (r *repository) GetByUserID(userID uuid.UUID) (*domain.Session, error) {
 	query := `SELECT id, user_id, expires_at FROM sessions WHERE user_id = $1`
-	row := r.db.QueryRow(query, userID)
+	row := r.db.QueryRow(query, userID.String())
 
 	var session domain.Session
 	err := row.Scan(&session.ID, &session.UserID, &session.ExpiresAt)
