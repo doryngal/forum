@@ -1,10 +1,14 @@
 package post
 
 import (
+	"errors"
+	"fmt"
 	"forum/internal/domain"
 	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/category"
+	"forum/internal/service/comment"
 	"forum/internal/service/post"
+	"forum/internal/service/post/validator"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
 	"github.com/google/uuid"
@@ -84,7 +88,9 @@ func (h *CreateHandler) handlePostCreateForm(w http.ResponseWriter, r *http.Requ
 	}
 
 	formData := h.extractFormData(r)
+	fmt.Println(formData)
 	if err := h.validateFormData(formData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		data, _ := h.prepareCreateFormData(r, err.Error(), formData, r.Form[categoriesField])
 		h.renderTemplate(w, data)
 		return
@@ -98,6 +104,7 @@ func (h *CreateHandler) handlePostCreateForm(w http.ResponseWriter, r *http.Requ
 
 	categoryUUIDs, err := h.parseCategoryIDs(r.Form[categoriesField])
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		data, _ := h.prepareCreateFormData(r, "Invalid category selection", formData, r.Form[categoriesField])
 		h.renderTemplate(w, data)
 		return
@@ -105,6 +112,7 @@ func (h *CreateHandler) handlePostCreateForm(w http.ResponseWriter, r *http.Requ
 
 	post := h.createPostObject(formData, user.ID)
 	if err := h.createPostWithCategories(post, categoryUUIDs); err != nil {
+		w.WriteHeader(httpStatusFromError(err))
 		data, _ := h.prepareCreateFormData(r, "Failed to create post: "+err.Error(), formData, r.Form[categoriesField])
 		h.renderTemplate(w, data)
 		return
@@ -135,9 +143,9 @@ func (h *CreateHandler) prepareCreateFormData(r *http.Request, errorMsg string, 
 
 func (h *CreateHandler) extractFormData(r *http.Request) map[string]string {
 	return map[string]string{
-		titleField:   strings.TrimSpace(r.FormValue(titleField)),
-		tagsField:    strings.TrimSpace(r.FormValue(tagsField)),
-		messageField: strings.TrimSpace(r.FormValue(messageField)),
+		titleField:      strings.TrimSpace(r.FormValue(titleField)),
+		categoriesField: strings.TrimSpace(r.FormValue(categoriesField)),
+		messageField:    strings.TrimSpace(r.FormValue(messageField)),
 	}
 }
 
@@ -182,6 +190,48 @@ func (h *CreateHandler) createPostWithCategories(post *domain.Post, categoryIDs 
 		return err
 	}
 	return h.categoryService.AssignCategoriesToPost(post.ID, categoryIDs)
+}
+
+func httpStatusFromError(err error) int {
+	switch {
+	case errors.Is(err, validator.ErrEmptyTitle),
+		errors.Is(err, validator.ErrEmptyContent),
+		errors.Is(err, validator.ErrTooShort),
+		errors.Is(err, validator.ErrTooLong),
+		errors.Is(err, domain.ErrCategoryRequired),
+		errors.Is(err, domain.ErrInvalidCategoryID),
+		errors.Is(err, comment.ErrInvalidComment),
+		errors.Is(err, domain.ErrUUIDParseFailed):
+		return http.StatusBadRequest
+
+	case errors.Is(err, post.ErrPostNotFound),
+		errors.Is(err, comment.ErrCommentNotFound):
+		return http.StatusNotFound
+	case errors.Is(err, domain.ErrEmailTaken),
+		errors.Is(err, domain.ErrUsernameTaken):
+		return http.StatusConflict
+
+	case errors.Is(err, domain.ErrUserNotFound):
+		return http.StatusUnauthorized
+
+	case errors.Is(err, domain.ErrForbidden):
+		return http.StatusForbidden
+
+	case errors.Is(err, domain.ErrInsertUserFailed),
+		errors.Is(err, domain.ErrQueryFailed),
+		errors.Is(err, domain.ErrUUIDParseFailed),
+		errors.Is(err, domain.ErrCheckExistsFailed),
+		errors.Is(err, domain.ErrInsertPostFailed),
+		errors.Is(err, domain.ErrLoadCategoriesFailed),
+		errors.Is(err, domain.ErrScanFailed),
+		errors.Is(err, domain.ErrGetReactionFailed),
+		errors.Is(err, domain.ErrReactionUpdateFailed),
+		errors.Is(err, domain.ErrReactionNotFound):
+		return http.StatusInternalServerError
+
+	default:
+		return http.StatusInternalServerError
+	}
 }
 
 func (h *CreateHandler) renderTemplate(w http.ResponseWriter, data *CreatePostData) error {
