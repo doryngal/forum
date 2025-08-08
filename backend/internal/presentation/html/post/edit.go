@@ -113,24 +113,13 @@ func (h *EditHandler) handlePostEditForm(w http.ResponseWriter, r *http.Request,
 	content := strings.TrimSpace(r.FormValue(messageField))
 	categoryIDs := r.Form[categoriesField]
 
-	if title == "" || content == "" {
-		data, err := h.prepareEditFormData(r, post, "Title and content are required")
-		if err != nil {
-			h.errorHandler.HandleError(w, "Failed to prepare form data", err, http.StatusInternalServerError)
-			return
-		}
-
-		if err := h.tmpl.ExecuteTemplate(w, editPostTemplate, data); err != nil {
-			h.errorHandler.HandleError(w, "Failed to render edit form", err, http.StatusInternalServerError)
-		}
-		return
-	}
-
 	// Update post
 	post.Title = title
 	post.Content = content
+
 	if err := h.postService.UpdatePost(post, userID); err != nil {
-		h.errorHandler.HandleError(w, "Failed to update post", err, http.StatusInternalServerError)
+		status := httpStatusFromError(err)
+		h.errorHandler.HandleError(w, "Failed to update post", err, status)
 		return
 	}
 

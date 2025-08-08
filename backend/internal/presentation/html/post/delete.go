@@ -57,7 +57,8 @@ func (h *DeleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validatePostOwnership(postID, user.ID); err != nil {
-		h.errorHandler.HandleError(w, "Forbidden", err, http.StatusForbidden)
+		status := httpStatusFromError(err)
+		h.errorHandler.HandleError(w, "Forbidden", err, status)
 		return
 	}
 
