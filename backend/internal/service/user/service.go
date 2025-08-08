@@ -49,7 +49,7 @@ func (s *service) RegisterUser(user *domain.User) error {
 	}
 	if taken {
 		s.log.Info("Username is already taken", logger.F("username", user.Username))
-		return ErrEmailTaken
+		return ErrUsernameTaken
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
