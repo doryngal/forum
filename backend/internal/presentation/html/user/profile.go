@@ -1,12 +1,14 @@
 package profile
 
 import (
+	"errors"
 	"forum/internal/domain"
 	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/comment"
 	"forum/internal/service/post"
 	"forum/internal/service/session"
 	"forum/internal/service/user"
+	"forum/internal/service/user/validator"
 	"github.com/google/uuid"
 	"html/template"
 	"net/http"
@@ -87,7 +89,8 @@ func (h *ProfileHandler) handlePostRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := h.processProfileAction(w, r, userID); err != nil {
-		h.errorHandler.HandleError(w, "Failed to process action", err, http.StatusInternalServerError)
+		status := httpStatusFromError(err)
+		h.errorHandler.HandleError(w, "Failed to process action", err, status)
 		return
 	}
 
@@ -234,4 +237,41 @@ func (h *ProfileHandler) prepareProfileData(user *domain.User, sessionID uuid.UU
 			"CommentCount": len(comments),
 		},
 	}, nil
+}
+
+func httpStatusFromError(err error) int {
+	switch {
+	case errors.Is(err, validator.ErrEmptyPassword),
+		errors.Is(err, validator.ErrInvalidEmail),
+		errors.Is(err, validator.ErrEmptyUsername),
+		errors.Is(err, validator.ErrPasswordTooShort),
+		errors.Is(err, domain.ErrCategoryRequired),
+		errors.Is(err, domain.ErrInvalidCategoryID):
+		return http.StatusBadRequest
+
+	case errors.Is(err, domain.ErrEmailTaken),
+		errors.Is(err, domain.ErrUsernameTaken):
+		return http.StatusConflict
+
+	case errors.Is(err, domain.ErrUserNotFound):
+		return http.StatusUnauthorized
+
+	case errors.Is(err, post.ErrPostNotFound):
+		return http.StatusNotFound
+
+	case errors.Is(err, domain.ErrInsertUserFailed),
+		errors.Is(err, domain.ErrQueryFailed),
+		errors.Is(err, domain.ErrUUIDParseFailed),
+		errors.Is(err, domain.ErrCheckExistsFailed),
+		errors.Is(err, domain.ErrInsertPostFailed),
+		errors.Is(err, domain.ErrLoadCategoriesFailed),
+		errors.Is(err, domain.ErrScanFailed),
+		errors.Is(err, domain.ErrGetReactionFailed),
+		errors.Is(err, domain.ErrReactionUpdateFailed),
+		errors.Is(err, domain.ErrReactionNotFound):
+		return http.StatusInternalServerError
+
+	default:
+		return http.StatusInternalServerError
+	}
 }
