@@ -1,11 +1,11 @@
 package category
 
 import (
-	"errors"
 	"forum/internal/domain"
 	category_repo "forum/internal/repository/category"
 	post_repo "forum/internal/repository/post"
 	"forum/internal/service/category/validator"
+	"forum/internal/service/post"
 	"github.com/google/uuid"
 )
 
@@ -55,17 +55,15 @@ func (s *service) AssignCategoriesToPost(postID uuid.UUID, categoryIDs []uuid.UU
 		return ErrInvalidPostID
 	}
 
+	if exists, err := s.postRepo.ExistsByID(postID); err != nil || !exists {
+		return post.ErrPostNotFound
+	}
+
 	if len(categoryIDs) == 0 {
 		return ErrNoCategories
 	}
 
-	_, err := s.postRepo.GetByID(postID)
-	if err != nil {
-		if errors.Is(err, ErrNotFound) {
-			return ErrInvalidPostID
-		}
-		return err
-	}
+	categoryIDs = removeDuplicateUUIDs(categoryIDs)
 
 	for _, catID := range categoryIDs {
 		if catID == uuid.Nil {
@@ -76,9 +74,21 @@ func (s *service) AssignCategoriesToPost(postID uuid.UUID, categoryIDs []uuid.UU
 			return err
 		}
 		if !exists {
-			return ErrInvalidCategoryID
+			return ErrNotFound
 		}
 	}
 
 	return s.repo.AssignToPost(postID, categoryIDs)
+}
+
+func removeDuplicateUUIDs(ids []uuid.UUID) []uuid.UUID {
+	seen := make(map[uuid.UUID]struct{})
+	result := make([]uuid.UUID, 0, len(ids))
+	for _, id := range ids {
+		if _, ok := seen[id]; !ok {
+			seen[id] = struct{}{}
+			result = append(result, id)
+		}
+	}
+	return result
 }
