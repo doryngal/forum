@@ -9,12 +9,10 @@ type Service interface {
 	CreatePost(post *domain.Post) error
 	GetPostByID(id uuid.UUID) (*domain.Post, error)
 	GetAllPosts() ([]*domain.Post, error)
-	GetPostsByCategory(categoryID uuid.UUID) ([]*domain.Post, error)
 	GetPostsByUserID(userID, sessionID uuid.UUID) ([]*domain.Post, error)
-	GetLikedPostsByUser(userID uuid.UUID) ([]*domain.Post, error)
 	LikePost(postID, userID uuid.UUID) error
 	DislikePost(postID, userID uuid.UUID) error
-	UpdatePost(post *domain.Post) error
+	UpdatePost(post *domain.Post, userID uuid.UUID) error
 	DeletePost(postID, userID uuid.UUID) error
 
 	GetLikedPosts(userID uuid.UUID) ([]*domain.Post, error)
