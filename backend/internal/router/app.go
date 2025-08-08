@@ -8,6 +8,7 @@ import (
 	"forum/internal/service"
 	"forum/pkg/database"
 	"forum/pkg/logger"
+	"forum/pkg/middleware/logging"
 	"forum/pkg/templates"
 	"net/http"
 )
@@ -31,5 +32,7 @@ func NewApp(cfg config.Config) (http.Handler, error) {
 
 	router := InitRouter(handlers, cfg.Server.StaticPath, log)
 
-	return router, nil
+	loggedRouter := logging.LoggingMiddleware(log, router)
+
+	return loggedRouter, nil
 }
