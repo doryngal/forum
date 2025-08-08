@@ -12,5 +12,4 @@ type Service interface {
 	GetUserByID(id uuid.UUID) (*domain.User, error)
 	IsEmailTaken(email string) (bool, error)
 	GetUserByUsername(username string) (*domain.User, error)
-	GetUserStats(userID uuid.UUID) (*domain.UserStats, error)
 }
