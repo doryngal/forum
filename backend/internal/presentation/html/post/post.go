@@ -2,6 +2,7 @@ package post
 
 import (
 	"errors"
+	"fmt"
 	"forum/internal/domain"
 	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/category"
@@ -114,7 +115,9 @@ func (h *PostHandler) handlePostAction(w http.ResponseWriter, r *http.Request, p
 
 	action := r.FormValue("action")
 	if err := h.processAction(r, action, postID, userID); err != nil {
-		h.errorHandler.HandleError(w, "Action failed", err, http.StatusInternalServerError)
+		fmt.Println(err)
+		status := httpStatusFromError(err)
+		h.errorHandler.HandleError(w, "Action failed", err, status)
 		return
 	}
 
@@ -180,7 +183,7 @@ func (h *PostHandler) handleCommentReaction(r *http.Request, action string, user
 	commentIDStr := r.FormValue(commentIDField)
 	commentID, err := uuid.Parse(commentIDStr)
 	if err != nil {
-		return err
+		return domain.ErrUUIDParseFailed
 	}
 
 	switch action {
