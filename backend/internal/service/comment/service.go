@@ -99,5 +99,9 @@ func (s *service) DislikeComment(commentID, userID uuid.UUID) error {
 }
 
 func (s *service) GetCommentsByUserID(userID uuid.UUID) ([]*domain.CommentWithPostTitle, error) {
+	if exists, err := s.userRepo.ExistsByID(userID); err != nil || !exists {
+		return nil, user.ErrUserNotFound
+	}
+
 	return s.repo.GetCommentsByUserID(userID)
 }
