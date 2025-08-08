@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../backend/forum.db:/app/forum.db
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/forum.db
+    restart: unless-stopped
