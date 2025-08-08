@@ -57,9 +57,13 @@ func (s *service) GetPostByID(id uuid.UUID) (*domain.Post, error) {
 		}
 		return nil, err
 	}
+
+	if post == nil {
+		return nil, ErrPostNotFound
+	}
+
 	return post, nil
 }
-
 func (s *service) GetAllPosts() ([]*domain.Post, error) {
 	posts, err := s.repo.GetAll()
 	if err != nil {
@@ -108,6 +112,10 @@ func (s *service) DislikePost(postID, userID uuid.UUID) error {
 }
 
 func (s *service) UpdatePost(post *domain.Post, userID uuid.UUID) error {
+	if err := s.validator.ValidatePost(post); err != nil {
+		return err
+	}
+
 	_, err := s.authorizePostAccess(post.ID, userID)
 	if err != nil {
 		return err
