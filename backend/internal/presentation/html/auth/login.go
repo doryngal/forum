@@ -63,6 +63,7 @@ func (h *LoginHandler) handleGetLogin(w http.ResponseWriter, r *http.Request) {
 
 func (h *LoginHandler) handlePostLogin(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		h.renderLogin(w, &LoginTemplateData{Error: "Invalid form submission"})
 		return
 	}
@@ -70,8 +71,15 @@ func (h *LoginHandler) handlePostLogin(w http.ResponseWriter, r *http.Request) {
 	credentials := r.FormValue(emailOrUsername)
 	password := r.FormValue(passwordField)
 
+	if credentials == "" || password == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		h.renderLogin(w, &LoginTemplateData{Error: "Email/Username and password are required"})
+		return
+	}
+
 	user, err := h.authenticateUser(credentials, password)
 	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized) // 401
 		h.renderLogin(w, &LoginTemplateData{Error: "Invalid credentials"})
 		return
 	}

@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"errors"
 	"forum/internal/domain"
 	"forum/internal/presentation/html/errorhandler"
 	"forum/internal/service/user"
+	"forum/internal/service/user/validator"
 	"html/template"
 	"net/http"
 	"strings"
@@ -65,6 +67,7 @@ func (h *RegisterHandler) handleGetRegister(w http.ResponseWriter, r *http.Reque
 func (h *RegisterHandler) handlePostRegister(w http.ResponseWriter, r *http.Request) {
 	formData, err := h.parseRegisterForm(r)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		h.renderRegisterForm(w, &RegisterFormData{
 			Error: "Invalid form data",
 		})
@@ -72,6 +75,7 @@ func (h *RegisterHandler) handlePostRegister(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := h.validateRegisterForm(formData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		h.renderRegisterForm(w, &RegisterFormData{
 			Error: err.Error(),
 			Form:  formData,
@@ -81,6 +85,7 @@ func (h *RegisterHandler) handlePostRegister(w http.ResponseWriter, r *http.Requ
 
 	user := h.createUserFromForm(formData)
 	if err := h.registerUser(user); err != nil {
+		w.WriteHeader(httpStatusFromError(err))
 		h.renderRegisterForm(w, &RegisterFormData{
 			Error: "Registration failed: " + err.Error(),
 			Form:  formData,
@@ -139,5 +144,28 @@ func (h *RegisterHandler) registerUser(user *domain.User) error {
 func (h *RegisterHandler) renderRegisterForm(w http.ResponseWriter, data *RegisterFormData) {
 	if err := h.tmpl.ExecuteTemplate(w, registerTemplate, data); err != nil {
 		h.errorHandler.HandleError(w, "Failed to render registration form", err, http.StatusInternalServerError)
+	}
+}
+
+func httpStatusFromError(err error) int {
+	switch {
+	case errors.Is(err, validator.ErrInvalidEmail),
+		errors.Is(err, validator.ErrEmptyUsername),
+		errors.Is(err, validator.ErrEmptyPassword),
+		errors.Is(err, validator.ErrPasswordTooShort),
+		errors.Is(err, validator.ErrPasswordTooWeak):
+		return http.StatusBadRequest
+
+	case errors.Is(err, user.ErrEmailTaken),
+		errors.Is(err, user.ErrUsernameTaken):
+		return http.StatusConflict
+
+	case errors.Is(err, domain.ErrInsertUserFailed),
+		errors.Is(err, domain.ErrQueryFailed),
+		errors.Is(err, domain.ErrUUIDParseFailed):
+		return http.StatusInternalServerError
+
+	default:
+		return http.StatusInternalServerError
 	}
 }
