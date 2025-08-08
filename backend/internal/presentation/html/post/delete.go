@@ -11,6 +11,11 @@ import (
 	"strings"
 )
 
+const (
+	deletePathPrefix = "/delete-post/"
+	profilePath      = "/profile/"
+)
+
 // DeleteHandler handles post deletion.
 type DeleteHandler struct {
 	postService    post.Service
@@ -19,8 +24,18 @@ type DeleteHandler struct {
 	errorHandler   errorhandler.Handler
 }
 
-func NewDeleteHandler(ps post.Service, ss session.Service, us user.Service, errorHandler errorhandler.Handler) *DeleteHandler {
-	return &DeleteHandler{ps, ss, us, errorHandler}
+func NewDeleteHandler(
+	postService post.Service,
+	sessionService session.Service,
+	userService user.Service,
+	errorHandler errorhandler.Handler,
+) *DeleteHandler {
+	return &DeleteHandler{
+		postService:    postService,
+		sessionService: sessionService,
+		userService:    userService,
+		errorHandler:   errorHandler,
+	}
 }
 
 func (h *DeleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -29,37 +44,63 @@ func (h *DeleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idStr := strings.TrimPrefix(r.URL.Path, "/delete-post/")
-	postID, err := uuid.Parse(idStr)
+	postID, err := h.extractPostID(r)
 	if err != nil {
-		http.NotFound(w, r)
+		h.errorHandler.HandleError(w, "Invalid post ID", err, http.StatusBadRequest)
 		return
 	}
 
-	user, err := h.getUserFromSession(r)
+	user, err := h.authenticateUser(r)
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, loginPath, http.StatusFound)
 		return
 	}
 
-	p, err := h.postService.GetPostByID(postID)
-	if err != nil || p.UserID != user.ID {
+	if err := h.validatePostOwnership(postID, user.ID); err != nil {
 		h.errorHandler.HandleError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
-	h.postService.DeletePost(postID, user.ID)
-	http.Redirect(w, r, "/profile/", http.StatusSeeOther)
+	if err := h.postService.DeletePost(postID, user.ID); err != nil {
+		h.errorHandler.HandleError(w, "Failed to delete post", err, http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, profilePath, http.StatusSeeOther)
 }
 
-func (h *DeleteHandler) getUserFromSession(r *http.Request) (*domain.User, error) {
-	cookie, err := r.Cookie("session_id")
+func (h *DeleteHandler) extractPostID(r *http.Request) (uuid.UUID, error) {
+	idStr := strings.TrimPrefix(r.URL.Path, deletePathPrefix)
+	return uuid.Parse(idStr)
+}
+
+func (h *DeleteHandler) authenticateUser(r *http.Request) (*domain.User, error) {
+	cookie, err := r.Cookie(sessionCookie)
 	if err != nil {
 		return nil, err
 	}
+
 	sess, err := h.sessionService.GetByToken(cookie.Value)
 	if err != nil {
 		return nil, err
 	}
+
+	if sess.UserID == uuid.Nil {
+		return nil, domain.ErrInvalidSession
+	}
+
 	return h.userService.GetUserByID(sess.UserID)
+}
+
+func (h *DeleteHandler) validatePostOwnership(postID, userID uuid.UUID) error {
+	post, err := h.postService.GetPostByID(postID)
+	if err != nil {
+		return err
+	}
+
+	if post.UserID != userID {
+		return domain.ErrForbidden
+	}
+
+	return nil
 }
