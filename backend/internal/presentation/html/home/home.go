@@ -10,6 +10,7 @@ import (
 	"forum/internal/service/user"
 	"github.com/google/uuid"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -98,7 +99,22 @@ func (h *Handler) handlePostAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.processPostAction(r, userID); err != nil {
-		h.errorHandler.HandleError(w, "Action failed", err, http.StatusInternalServerError)
+		var status int
+
+		switch {
+		case errors.Is(err, domain.ErrInvalidPostID),
+			errors.Is(err, domain.ErrInvalidAction):
+			status = http.StatusBadRequest
+		case errors.Is(err, domain.ErrUnauthorized),
+			errors.Is(err, domain.ErrInvalidSession):
+			status = http.StatusUnauthorized
+		case errors.Is(err, post.ErrPostNotFound):
+			status = http.StatusNotFound
+		default:
+			status = http.StatusInternalServerError
+		}
+
+		h.errorHandler.HandleError(w, "Action failed", err, status)
 		return
 	}
 
@@ -116,7 +132,10 @@ func (h *Handler) prepareHomeData(r *http.Request) (*HomePageData, error) {
 		return nil, err
 	}
 
-	categories, _ := h.categoryService.GetAllCategories() // Ignore category error
+	categories, err := h.categoryService.GetAllCategories()
+	if err != nil {
+		log.Printf("warning: failed to load categories: %v", err)
+	}
 
 	return &HomePageData{
 		User:       user,
