@@ -36,6 +36,10 @@ func (h *Handler) HandleError(w http.ResponseWriter, errorMsg string, errLog err
 		return
 	}
 
+	if errLog != nil {
+		h.logger.Error(errLog.Error())
+	}
+
 	w.WriteHeader(statusCode)
 	if _, err := buf.WriteTo(w); err != nil {
 		h.logger.Errorf("failed to write response: %v", err)
